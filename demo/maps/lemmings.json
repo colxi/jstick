@@ -1,0 +1,14 @@
+{
+    "title"         : "Lemmings",
+    "source"        : "1.png",
+    "startPoint"    : [10,10],
+    "endPoint"      : [30,30],
+    "lemmingsCount" : 100,
+    "lemminjsSave"  : 40,
+    "maxTime"       : 120,
+    "tools"         : {
+        "block"     : 5,
+        "climb"     : 2,
+        "dig"       : 10
+    }
+}

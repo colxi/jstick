@@ -1,0 +1,45 @@
+{
+    "spritesheet" : "./spritesheet/lemmings.png",
+    "sprites" : {
+        "sprite-walk" : {
+            "loop"   : true,
+            "length" : 20,
+            "frames" : {
+                "0"  : {
+                    "x" : 5,
+                    "y" : 1,
+                    "width" : 4,
+                    "height" : 9,
+                    "pivot" : [ 3 ,2 ]                
+                },
+                "10" : {
+                    "x" : 10,
+                    "y" : 10,
+                    "width" : 10,
+                    "height" : 10,
+                    "pivot" : [ 5 ,5 ]                
+                }
+            }
+        },
+        "sprite-fall" : {
+            "loop"   : true,
+            "length" : 20,
+            "frames" : {
+                "0"  : {
+                    "x" : 5,
+                    "y" : 1,
+                    "width" : 4,
+                    "height" : 9,
+                    "pivot" : [ 3 ,2 ]                
+                },
+                "10" : {
+                    "x" : 10,
+                    "y" : 10,
+                    "width" : 10,
+                    "height" : 10,
+                    "pivot" : [ 5 ,5 ]                
+                }
+            }
+        }
+    }
+} 
