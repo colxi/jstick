@@ -31,7 +31,7 @@ const PixelMap = /* async */ function( image = '' ){
         this.buffer = imageData.data;
         this.Cursor = {
             x : 0,
-            y:0
+            y : 0
         };
 
         this.draw = function(){

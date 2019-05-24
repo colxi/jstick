@@ -11,6 +11,8 @@ import {myStates} from './my-states.js';
 
 window.JStick = JStick;
 
+window.action = 'erase';
+
 let pixelMap;
 let Actors
 
@@ -97,7 +99,21 @@ let Actors
         document.getElementById('inputKeybArrowDown').innerHTML = input['arrow-down'];
         document.getElementById('inputKeybArrowLeft').innerHTML = input['arrow-left'];
         document.getElementById('inputKeybArrowRight').innerHTML = input['arrow-right'];
-        if(input.mouseWheelUp) console.log( input )
+        
+        if(input['mouse-wheel-up']) setZoom( input.MOUSEX, input.MOUSEY, 1 );
+        if(input['mouse-wheel-down']) setZoom( input.MOUSEX, input.MOUSEY, -1 );
+        
+        if(input['arrow-right']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x + 10, JStick.Viewport.Scroll.y );
+        if(input['arrow-left']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x - 10, JStick.Viewport.Scroll.y );
+        if(input['arrow-up']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x , JStick.Viewport.Scroll.y - 10 );
+        if(input['arrow-down']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x , JStick.Viewport.Scroll.y + 10 );
+        
+        if(input['draw-but']) window.action='draw';
+        if(input['erase-but']) window.action='erase';
+        
+        if(input['mouse-left']) applyAction( input.MOUSEX, input.MOUSEY );
+
+
         // iterate all actors and update their States
         for(let i = 0; i < Actors.length; i++){ 
             Actors[i].updateState( pixelMap );
@@ -123,84 +139,50 @@ let Actors
 
 
 
-window.action = 'erase';
-
-let clicked = false;
-container.onmousedown = (e)=>{ clicked = true; }
-container.onmouseup   = (e)=>{ clicked = false; }
 
 
-/*
-
-container.onclick= e=>{
-    console.log(e)
-    if(window.action === 'zoomIn'){
-        JStick.Viewport.zoomTo( JStick.Viewport.scale + JStick.Viewport.scaleFactor , e.layerX , e.layerY  )
-    }
-    if(window.action === 'zoomOut'){
-        JStick.Viewport.zoomTo( JStick.Viewport.scale - JStick.Viewport.scaleFactor , e.layerX , e.layerY  )
-    }
-}
-
-
-container.onmousemove= e=>{
-    if(clicked){
-        let [x , y] = JStick.Viewport.getMapCoordinates(e.layerX,e.layerY);
-
-
-        if(window.action === 'erase'){
-            pixelMap.clearPixel(x -1, y -1);
-            pixelMap.clearPixel(x +0, y -1);
-            pixelMap.clearPixel(x +1, y -1);
-
-            pixelMap.clearPixel(x -1, y +0);
-            pixelMap.clearPixel(x +0, y +0);
-            pixelMap.clearPixel(x +1, y +0);
-
-            pixelMap.clearPixel(x -1, y +1);
-            pixelMap.clearPixel(x +0, y +1);
-            pixelMap.clearPixel(x +1, y +1);
-        }
-        else if(window.action=== 'draw'){
-            pixelMap.setPixel(x -1, y -1, [255,255,255,255]);
-            pixelMap.setPixel(x +0, y -1, [255,255,255,255]);
-            pixelMap.setPixel(x +1, y -1, [255,255,255,255]);
-
-            pixelMap.setPixel(x -1, y +0, [255,255,255,255]);
-            pixelMap.setPixel(x +0, y +0, [255,255,255,255]);
-            pixelMap.setPixel(x +1, y +0, [255,255,255,255]);
-
-            pixelMap.setPixel(x -1, y +1, [255,255,255,255]);
-            pixelMap.setPixel(x +0, y +1, [255,255,255,255]);
-            pixelMap.setPixel(x +1, y +1, [255,255,255,255]);
-        }
-    }
-}
-
-*/
-
-
-/*
-
-
-// Handle mousenwheel zoom
-JStick.Viewport.Layers.container.onwheel = function(e){
-    e.preventDefault();
-    let direction = e.deltaY > 0 ? 1 : -1;
+function setZoom( x,y,direction ){
     let newScale= JStick.Viewport.scale + ( JStick.Viewport.scaleFactor * direction );
-    JStick.Viewport.zoomTo(newScale, e.offsetX , e.offsetY);
+    JStick.Viewport.zoomTo(newScale, x , y);
 }
-  
-// handlencursor keys to move scroll
-window.onkeydown = function(event){
-    event.preventDefault();
-    if(event.keyCode == 37)      JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x -10,JStick.Viewport.Scroll.y) ;
-    else if(event.keyCode == 39) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x +10,JStick.Viewport.Scroll.y) ;
-    else if(event.keyCode == 38) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x ,JStick.Viewport.Scroll.y - 10) ;
-    else if(event.keyCode == 40) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x ,JStick.Viewport.Scroll.y + 10) ;
-};
 
-*/
-  
+function applyAction(x,y){
+    console.log('action',window.action, x,y)
+    if( window.action === 'zoomIn' ){
+        JStick.Viewport.zoomTo( JStick.Viewport.scale + JStick.Viewport.scaleFactor , x , y  )
+    }else if( window.action === 'zoomOut' ){
+        JStick.Viewport.zoomTo( JStick.Viewport.scale - JStick.Viewport.scaleFactor , x , y  )
+    }else if( window.action === 'erase' ){
+        [x , y] = JStick.Viewport.toMapCoordinates( x, y );
+
+        pixelMap.clearPixel(x -1, y -1);
+        pixelMap.clearPixel(x +0, y -1);
+        pixelMap.clearPixel(x +1, y -1);
+
+        pixelMap.clearPixel(x -1, y +0);
+        pixelMap.clearPixel(x +0, y +0);
+        pixelMap.clearPixel(x +1, y +0);
+
+        pixelMap.clearPixel(x -1, y +1);
+        pixelMap.clearPixel(x +0, y +1);
+        pixelMap.clearPixel(x +1, y +1);
+    }else if( window.action === 'draw' ){
+        [x , y] = JStick.Viewport.toMapCoordinates( x, y );
+
+        pixelMap.setPixel(x -1, y -1, [255,255,255,255]);
+        pixelMap.setPixel(x +0, y -1, [255,255,255,255]);
+        pixelMap.setPixel(x +1, y -1, [255,255,255,255]);
+
+        pixelMap.setPixel(x -1, y +0, [255,255,255,255]);
+        pixelMap.setPixel(x +0, y +0, [255,255,255,255]);
+        pixelMap.setPixel(x +1, y +0, [255,255,255,255]);
+
+        pixelMap.setPixel(x -1, y +1, [255,255,255,255]);
+        pixelMap.setPixel(x +0, y +1, [255,255,255,255]);
+        pixelMap.setPixel(x +1, y +1, [255,255,255,255]);
+    }
+
+}
+
 
 
