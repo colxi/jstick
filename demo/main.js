@@ -46,7 +46,8 @@ let Actors
     JStick.Input.setButtonMapping( 'ARROWLEFT'      , 'arrow-left' );
     JStick.Input.setButtonMapping( 'ARROWRIGHT'     , 'arrow-right' );
 
-    JStick.Viewport.hideDeviceCursor(true);
+    JStick.Viewport.hideDeviceCursor = true;
+    JStick.Sprite.drawBoundingBoxes  = true;
 
     // Load the spritesheet
     let spriteSheet  = await JStick.Image.load( './spritesheet/lemmings.png' );

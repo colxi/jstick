@@ -1,6 +1,6 @@
 import {JStick} from '../jstick.js';
 
-
+let BOUNDING_BOXES = false;
 
 JStick.Sprite = {
 
@@ -49,6 +49,10 @@ JStick.Sprite = {
             x : x + image.width  - 3 - JStick.Viewport.Scroll.x,
             y : y + image.height - 1 - JStick.Viewport.Scroll.y,
         }
+        if( BOUNDING_BOXES ){
+            JStick.Viewport.Layers.sprites.strokeStyle = "#FF0000";
+            JStick.Viewport.Layers.sprites.strokeRect(x- JStick.Viewport.Scroll.x, y- JStick.Viewport.Scroll.y,image.width,image.height);
+        }
         
         // draw axis
         JStick.Viewport.Layers.sprites.fillStyle = "#00FFFF";
@@ -59,5 +63,14 @@ JStick.Sprite = {
         JStick.Viewport.Layers.sprites.fillRect(lemCenter.x, lemCenter.y,1,1);
     },
 
-    flip(){} //flips the reference, updates cache, removes from cache previous sprite
+    set drawBoundingBoxes( val ){
+        if( typeof val !== 'boolean' ) throw new Error('Value must be a boolean'); 
+        BOUNDING_BOXES = val;
+        return true;
+    },
+    get drawBoundingBoxes(){ return BOUNDING_BOXES },
+
+    flip(){}, //flips the reference, updates cache, removes from cache previous sprite
+    
+    scale(){} //scale the reference, updates cache, removes from cache previous sprite
 };

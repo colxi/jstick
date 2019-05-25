@@ -16,6 +16,7 @@ let TARGET_SCROLL = false; /*{
 }
 */
 
+let HIDE_DEVICE_CURSOR = false;
 
 
 JStick.Viewport = {
@@ -49,16 +50,20 @@ JStick.Viewport = {
     // zoom modifier to apply in each step until target zoom is reached
     scaleStep : 0.05,
 
+    
     // native cursor
-    hideDeviceCursor( value ){
+    set hideDeviceCursor( value ){
         if (typeof value !== "boolean"){
             throw new Error('Viewport.deviceCursor() : Argument 1 must be a Boolean');
         }
 
         if( value ) JStick.Viewport.Layers.container.setAttribute('hide-device-cursor',true);
         else JStick.Viewport.Layers.container.removeAttribute('hide-device-cursor');
+        HIDE_DEVICE_CURSOR = value;
         return true;
     },
+    get hideDeviceCursor(){ return HIDE_DEVICE_CURSOR },
+
 
     /**
      * Viewport.clear() : Clears the Viewport
