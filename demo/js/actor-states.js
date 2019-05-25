@@ -1,4 +1,3 @@
-import {JStick} from '../src/jstick.js';
 
 function checkGroundCollision( sprite ){
     let x = Math.floor( this.x +5 - (5/2) );

@@ -1,3 +1,5 @@
+import {JStick} from '../../jstick.js';
+
 export default {
     name    : 'keyboard',
     signals : [
