@@ -38,11 +38,11 @@ JStick.Viewport = {
         x : 0,
         y : 0
     },
-    
+
     __Scroll__ : {
         x : 0,
         y : 0
-    }
+    },
 
     imageSmoothing: false,
 
