@@ -23,7 +23,7 @@ const JStick  = {
 
         document.getElementById('FPS').innerHTML = JStick.FPS.value;
         document.getElementById("scaleInfo").innerHTML = JStick.Viewport.scale.toFixed(2);
-        document.getElementById("scrollInfo").innerHTML = Math.floor(JStick.Viewport.Scroll.x) +' | '+Math.floor(JStick.Viewport.Scroll.y);
+        document.getElementById("scrollInfo").innerHTML = JStick.Viewport.Scroll.x +' | '+JStick.Viewport.Scroll.y;
 
         //let b = Map.getBufferIndex(lem.x+lem.w-3,lem.y+lem.h)
         //document.getElementById('mapData').innerHTML= Map.buffer[b+3];
