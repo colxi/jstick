@@ -61,10 +61,10 @@ JStick.Viewport = {
 
     get imageSmoothing(){ return IMAGE_SMOOTHING },
     set imageSmoothing( val ){ 
-        // DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
-        // Keeping float values garantees better precision.
         if( typeof val !== 'boolean' ) throw new Error('Scroll value must be a boolean');
         IMAGE_SMOOTHING = val ;
+        JStick.Viewport.Layers.map.imageSmoothingEnabled     = IMAGE_SMOOTHING;
+        JStick.Viewport.Layers.sprites.imageSmoothingEnabled = IMAGE_SMOOTHING;
         return true;
     },
 

@@ -52,8 +52,8 @@ let Actors
                 }
             }) 
         );
-        if( Actors.length > 10 ) clearInterval( interval );
-    }, 1000);
+        if( Actors.length > 100 ) clearInterval( interval );
+    }, 100);
 
 
     pixelMap = await new PixelMap('./maps/map2.png');
