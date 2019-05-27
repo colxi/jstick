@@ -41,23 +41,38 @@ JStick.Viewport = {
     Scroll : {
         get x(){ return SCROLL_X },
         set x(val){ 
-            if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
-            if( !JStick.allowNegativeScroll && val<0 ) val = 0;
-            // DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
+            // Note: DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
             // Keeping float values garantees better precision.
-            SCROLL_X = val ;
+            if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
+            // prevent negative is scroll if disabled
+            if( !JStick.Viewport.allowNegativeScroll && val<0 ) val = 0;
+            // limit maxscroll if scroll width has been set
+            if( JStick.Viewport.Scroll.width!==false){
+                let maxScroll = Math.max( 0, ( (JStick.Viewport.Scroll.width * JStick.Viewport.scale) - JStick.Viewport.width ) / JStick.Viewport.scale );
+                if( val > maxScroll ) val = maxScroll;
+            }
+            SCROLL_X = val;
             return true;
         },
         get y(){ return SCROLL_Y },
         set y(val){ 
-            // DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
+            // Note DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
             // Keeping float values garantees better precision.
             if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
-            if( !JStick.allowNegativeScroll && val<0 ) val = 0;
+            // prevent negative is scroll if disabled
+            if( !JStick.Viewport.allowNegativeScroll && val<0 ) val = 0;
+            // limit maxscroll if scroll height has been set
+            if( JStick.Viewport.Scroll.height!==false){
+                let maxScroll = Math.max( 0, ( (JStick.Viewport.Scroll.height * JStick.Viewport.scale) - JStick.Viewport.height ) / JStick.Viewport.scale );
+                if( val > maxScroll ) val = maxScroll;
+            }
             SCROLL_Y = val ;
             return true;
         },
+        width : false,
+        height: false
     },
+
 
     get imageSmoothing(){ return IMAGE_SMOOTHING },
     set imageSmoothing( val ){ 
@@ -78,6 +93,12 @@ JStick.Viewport = {
     // zoom modifier to apply in each step until target zoom is reached
     scaleStep : 0.05,
 
+    Zoom : {
+        step    : 0.05,
+        value   : 0, 
+        max     : 2,
+        min     : 1
+    },
     
     // native cursor
     set hideDeviceCursor( value ){
@@ -127,8 +148,8 @@ JStick.Viewport = {
     
     toMapCoordinates( x , y ){
         return [
-            Math.floor( ( x / JStick.Viewport.scale ) + JStick.Viewport.Scroll.x ) ,
-            Math.floor( ( y / JStick.Viewport.scale ) + JStick.Viewport.Scroll.y )
+            Math.floor( ( x / JStick.Viewport.scale ) + SCROLL_X ) ,
+            Math.floor( ( y / JStick.Viewport.scale ) + SCROLL_Y )
         ];
     },
     
@@ -190,24 +211,24 @@ JStick.Viewport = {
         let scrollFactor = 2;
 
         if( TARGET_SCROLL.x !== false ){
-            if( JStick.Viewport.Scroll.x < TARGET_SCROLL.x){
-                let target = JStick.Viewport.Scroll.x + scrollFactor;
+            if( SCROLL_X < TARGET_SCROLL.x){
+                let target = SCROLL_X + scrollFactor;
                 if( target < TARGET_SCROLL.x ) JStick.Viewport.Scroll.x = target;
                 else TARGET_SCROLL.x = false;
             }else{
-                let target = JStick.Viewport.Scroll.x - scrollFactor;
+                let target = SCROLL_X - scrollFactor;
                 if( target > TARGET_SCROLL.x ) JStick.Viewport.Scroll.x = target;
                 else TARGET_SCROLL.x = false;
             }
         }
 
         if( TARGET_SCROLL.y !== false ){
-            if( JStick.Viewport.Scroll.y < TARGET_SCROLL.y){
-                let target = JStick.Viewport.Scroll.y + scrollFactor;
+            if( SCROLL_Y < TARGET_SCROLL.y){
+                let target = SCROLL_Y + scrollFactor;
                 if( target < TARGET_SCROLL.y ) JStick.Viewport.Scroll.y = target;
                 else TARGET_SCROLL.y = false;
             }else{
-                let target = JStick.Viewport.Scroll.y - scrollFactor;
+                let target = SCROLL_Y - scrollFactor;
                 if( target > TARGET_SCROLL.y ) JStick.Viewport.Scroll.y = target;
                 else TARGET_SCROLL.y = false;
             }

@@ -5,8 +5,8 @@ import {JStick} from '../jstick.js';
 
 JStick.Map = {
     draw( map ){
-        let x1 = ( 0 - JStick.Viewport.Scroll.x ) ;
-        let y1 = ( 0 - JStick.Viewport.Scroll.y ) ;
+        let x1 = ( 0 - JStick.Viewport.Scroll.x );
+        let y1 = ( 0 - JStick.Viewport.Scroll.y );
         let x2 = map.width ;
         let y2 = map.height;
         // Draw map data in canvas

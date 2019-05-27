@@ -8,7 +8,7 @@ JStick.Sprite = {
         // Handle Sprite object reference, and extract the actual image data from it
         if( typeof image === 'object' && image.__type__ === 'Sprite'){
             // Perform a XOR operation betwen flip and the Sprite object 
-            // Flip property status. If both spurces are set to true, 
+            // Flip property status. If both flips are set to true, 
             // flip is cancelled.
             flipX = flipX ^ image.flip.x;
             flipY = flipY ^ image.flip.y;
@@ -39,9 +39,9 @@ JStick.Sprite = {
         // Viewport scroll 
         JStick.Viewport.Layers.sprites.drawImage( 
             image , 
-            x - JStick.Viewport.Scroll.x, 
-            y - JStick.Viewport.Scroll.y, 
-            image.width , 
+            ( x - JStick.Viewport.Scroll.x ), 
+            ( y - JStick.Viewport.Scroll.y ), 
+            image.width, 
             image.height
         );
 

@@ -20,7 +20,7 @@ let Actors
 
 (async function(){
     JStick.Viewport.hideDeviceCursor = true;
-    JStick.Sprite.drawBoundingBoxes  = true;
+    //JStick.Sprite.drawBoundingBoxes  = true;
 
     // Load the spritesheet
     let spriteSheet  = await JStick.Image.load( './spritesheet/lemmings.png' );
@@ -45,23 +45,27 @@ let Actors
             new Actor({
                 states : [walkState, fallState],
                 state  : 'walk',
-                x      : 500,
-                y      : 80,
+                x      : 470,
+                y      : 102,
                 attributes : {
                     direction : 1
                 }
             }) 
         );
         if( Actors.length > 100 ) clearInterval( interval );
-    }, 100);
+    }, 800);
 
 
     pixelMap = await new PixelMap('./maps/map2.png');
+    
+    JStick.Viewport.zoomTo(JStick.Viewport.height/pixelMap.height,700,150);
+    
 
+    JStick.Viewport.Scroll.width  =  pixelMap.width;
+    JStick.Viewport.Scroll.height =  pixelMap.height;
 
     /** LOOP : UPDATE */
-    JStick.Loop.update = function( input ){
-
+    JStick.Loop.update = function( deltaTime , input ){
         document.getElementById('inputMouseCoords').innerHTML = input['MOUSEX'] + '-' + input['MOUSEY'];
         document.getElementById('inputMouseLeft').innerHTML = input['mouse-left'];
         document.getElementById('inputMouseRight').innerHTML = input['mouse-right'];
@@ -95,7 +99,7 @@ let Actors
     }
     
     /* LOOP : DRAW */
-    JStick.Loop.draw = function( input ){
+    JStick.Loop.draw = function( deltaTime,  input ){
         document.getElementById('actorsCounts').innerHTML = Actors.length;
         JStick.Viewport.clear();
         pixelMap.draw( );
