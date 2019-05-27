@@ -23,6 +23,9 @@ let SCROLL_Y = 0;
 
 let IMAGE_SMOOTHING = false;
 
+// zoom modifier to apply in each step until target zoom is reached
+let ZOOM_MODIFIER = 0.05;
+
 JStick.Viewport = {
     width : document.getElementById('container').offsetWidth << 0,
     height : document.getElementById('container').offsetHeight << 0,
@@ -45,7 +48,7 @@ JStick.Viewport = {
             // Keeping float values garantees better precision.
             if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
             // prevent negative is scroll if disabled
-            if( !JStick.Viewport.allowNegativeScroll && val<0 ) val = 0;
+            if( !JStick.Viewport.Scroll.allowNegativeScrolling && val<0 ) val = 0;
             // limit maxscroll if scroll width has been set
             if( JStick.Viewport.Scroll.width!==false){
                 let maxScroll = Math.max( 0, ( (JStick.Viewport.Scroll.width * JStick.Viewport.scale) - JStick.Viewport.width ) / JStick.Viewport.scale );
@@ -60,7 +63,7 @@ JStick.Viewport = {
             // Keeping float values garantees better precision.
             if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
             // prevent negative is scroll if disabled
-            if( !JStick.Viewport.allowNegativeScroll && val<0 ) val = 0;
+            if( !JStick.Viewport.Scroll.allowNegativeScrolling && val<0 ) val = 0;
             // limit maxscroll if scroll height has been set
             if( JStick.Viewport.Scroll.height!==false){
                 let maxScroll = Math.max( 0, ( (JStick.Viewport.Scroll.height * JStick.Viewport.scale) - JStick.Viewport.height ) / JStick.Viewport.scale );
@@ -70,9 +73,12 @@ JStick.Viewport = {
             return true;
         },
         width : false,
-        height: false
+        height: false,
+        animate : true,
+        allowNegativeScrolling : false,
     },
 
+    defineSceneSize(){} , // sets the width and the height of a scene, this values are used for automatic streching and fitting
 
     get imageSmoothing(){ return IMAGE_SMOOTHING },
     set imageSmoothing( val ){ 
@@ -85,19 +91,16 @@ JStick.Viewport = {
 
     // allow/disallow scales lower than 1 (scale reduction)
     allowNegativeScale : false,
-    allowNegativeScroll : false,
     // current scale
     scale : 1,
-    // default zoom modifier to apply 
-    scaleFactor : 1,
-    // zoom modifier to apply in each step until target zoom is reached
-    scaleStep : 0.05,
+
+
 
     Zoom : {
-        step    : 0.05,
-        value   : 0, 
+        factor  : 0, 
         max     : 2,
-        min     : 1
+        min     : 1,
+        animate : true
     },
     
     // native cursor
@@ -167,12 +170,12 @@ JStick.Viewport = {
 
         if( TARGET_ZOOM.level > JStick.Viewport.scale ){
             // ZOM IN, apply a Viewport.scaleStep scale ipncrease
-            JStick.Viewport.scale += JStick.Viewport.scaleStep;
+            JStick.Viewport.scale += ZOOM_MODIFIER;
             // if applying increment, zoom level became bigger than target zoom, limit it
             if( JStick.Viewport.scale > TARGET_ZOOM.level ) JStick.Viewport.scale = TARGET_ZOOM.level;
         }else{
             // ZOM OUT
-            JStick.Viewport.scale -= JStick.Viewport.scaleStep;
+            JStick.Viewport.scale -= ZOOM_MODIFIER;
             // if applying increment, zoom level became bigger than target zoom, limit it
             if( JStick.Viewport.scale < TARGET_ZOOM.level ) JStick.Viewport.scale = TARGET_ZOOM.level;
         }
@@ -196,7 +199,7 @@ JStick.Viewport = {
     },
 
     updateScroll(){
-        if(TARGET_SCROLL && !JStick.Viewport.allowNegativeScroll){
+        if(TARGET_SCROLL && !JStick.Viewport.Scroll.allowNegativeScrolling){
             if( TARGET_SCROLL.x < 0 ) TARGET_SCROLL.x = 0; 
             if( TARGET_SCROLL.y < 0 ) TARGET_SCROLL.y = 0; 
         }
@@ -241,11 +244,11 @@ JStick.Viewport = {
     /**
      * 
      * Viewport.zoomTo() : With the provided zoom factor, perform a zoom at the provided Viewport coordinates.
-     *                      If no zoom factor is provided use JStick.Viewport.scaleFactor default value, and if no coordinates
+     *                      If no zoom factor is provided use 1 as default value, and if no coordinates
      *                      are provided use the center of the vieport, as zooming target coordinates
      * 
      */
-    zoomTo( level = JStick.Viewport.scaleFactor, x = JStick.Viewport.width/2, y = JStick.Viewport.height/2 ){
+    zoomTo( level = 1, x = JStick.Viewport.width/2, y = JStick.Viewport.height/2 ){
         TARGET_ZOOM = {
             x : x,
             y : y,

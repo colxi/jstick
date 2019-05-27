@@ -55,7 +55,8 @@ let Actors
         if( Actors.length > 100 ) clearInterval( interval );
     }, 800);
 
-
+    // todo: create Scene, add layer (PixelMap) to the scene, pass the scene to the 
+    // viewport with config values to allow him to autoadapt 
     pixelMap = await new PixelMap('./maps/map2.png');
     
     JStick.Viewport.zoomTo(JStick.Viewport.height/pixelMap.height,700,150);
@@ -120,16 +121,16 @@ let Actors
 
 
 function setZoom( x,y,direction ){
-    let newScale= JStick.Viewport.scale + ( JStick.Viewport.scaleFactor * direction );
+    let newScale= JStick.Viewport.scale + ( 1 * direction );
     JStick.Viewport.zoomTo(newScale, x , y);
 }
 
 function applyAction(x,y){
     console.log('action',window.action, x,y)
     if( window.action === 'zoomIn' ){
-        JStick.Viewport.zoomTo( JStick.Viewport.scale + JStick.Viewport.scaleFactor , x , y  )
+        JStick.Viewport.zoomTo( JStick.Viewport.scale + 1 , x , y  )
     }else if( window.action === 'zoomOut' ){
-        JStick.Viewport.zoomTo( JStick.Viewport.scale - JStick.Viewport.scaleFactor , x , y  )
+        JStick.Viewport.zoomTo( JStick.Viewport.scale - 1 , x , y  )
     }else if( window.action === 'erase' ){
         [x , y] = JStick.Viewport.toMapCoordinates( x, y );
 
