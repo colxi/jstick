@@ -39,19 +39,19 @@ JStick.Sprite = {
         // Viewport scroll 
         JStick.Viewport.Layers.sprites.drawImage( 
             image , 
-            ( x - JStick.Viewport.Scroll.x ), 
-            ( y - JStick.Viewport.Scroll.y ), 
+            ( x - JStick.Viewport.scrollX ), 
+            ( y - JStick.Viewport.scrollY ), 
             image.width, 
             image.height
         );
 
         let lemCenter = {
-            x : x + image.width  - 3 - JStick.Viewport.Scroll.x,
-            y : y + image.height - 1 - JStick.Viewport.Scroll.y,
+            x : x + image.width  - 3 - JStick.Viewport.scrollX,
+            y : y + image.height - 1 - JStick.Viewport.scrollY,
         }
         if( BOUNDING_BOXES ){
             JStick.Viewport.Layers.sprites.strokeStyle = "#FF0000";
-            JStick.Viewport.Layers.sprites.strokeRect(x- JStick.Viewport.Scroll.x, y- JStick.Viewport.Scroll.y,image.width,image.height);
+            JStick.Viewport.Layers.sprites.strokeRect(x- JStick.Viewport.scrollX, y- JStick.Viewport.scrollY,image.width,image.height);
         }
         
         // draw axis

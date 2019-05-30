@@ -62,8 +62,8 @@ let Actors
     JStick.Viewport.zoomTo(JStick.Viewport.height/pixelMap.height,700,150);
     
 
-    JStick.Viewport.Scroll.width  =  pixelMap.width;
-    JStick.Viewport.Scroll.height =  pixelMap.height;
+    JStick.Viewport.scrollWidth  =  pixelMap.width;
+    JStick.Viewport.scrollHeight =  pixelMap.height;
 
     /** LOOP : UPDATE */
     JStick.Loop.update = function( deltaTime , input ){
@@ -82,10 +82,10 @@ let Actors
         if(input['mouse-wheel-up']) setZoom( input.MOUSEX, input.MOUSEY, 1 );
         if(input['mouse-wheel-down']) setZoom( input.MOUSEX, input.MOUSEY, -1 );
         
-        if(input['arrow-right']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x + 10, JStick.Viewport.Scroll.y );
-        if(input['arrow-left']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x - 10, JStick.Viewport.Scroll.y );
-        if(input['arrow-up']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x , JStick.Viewport.Scroll.y - 10 );
-        if(input['arrow-down']) JStick.Viewport.scrollTo( JStick.Viewport.Scroll.x , JStick.Viewport.Scroll.y + 10 );
+        if(input['arrow-right']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX + 10, JStick.Viewport.scrollY );
+        if(input['arrow-left']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX - 10, JStick.Viewport.scrollY );
+        if(input['arrow-up']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX , JStick.Viewport.scrollY - 10 );
+        if(input['arrow-down']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX , JStick.Viewport.scrollY + 10 );
         
         if(input['draw-but']) window.action='draw';
         if(input['erase-but']) window.action='erase';
@@ -112,7 +112,8 @@ let Actors
 
         return;
     }
-    JStick.frame();
+
+    
 
 })();
 

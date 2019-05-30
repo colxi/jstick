@@ -27,8 +27,36 @@ let IMAGE_SMOOTHING = false;
 let ZOOM_MODIFIER = 0.05;
 
 JStick.Viewport = {
+    /*********************************************************************/
+    /*
+    /* SIZES AND APPEARENCE PROPERTIES
+    /*
+    /*********************************************************************/
     width : document.getElementById('container').offsetWidth << 0,
     height : document.getElementById('container').offsetHeight << 0,
+
+    // Show/hide native device cursor (applies : CSS cursor:none)
+    get hideDeviceCursor(){ return HIDE_DEVICE_CURSOR },
+    set hideDeviceCursor( value ){
+        if (typeof value !== "boolean"){
+            throw new Error('Viewport.deviceCursor() : Argument 1 must be a Boolean');
+        }
+
+        if( value ) JStick.Viewport.Layers.container.setAttribute('hide-device-cursor',true);
+        else JStick.Viewport.Layers.container.removeAttribute('hide-device-cursor');
+        HIDE_DEVICE_CURSOR = value;
+        return true;
+    },
+
+    // Enable/disable imageSmoothing
+    get imageSmoothing(){ return IMAGE_SMOOTHING },
+    set imageSmoothing( val ){ 
+        if( typeof val !== 'boolean' ) throw new Error('Scroll value must be a boolean');
+        IMAGE_SMOOTHING = val ;
+        JStick.Viewport.Layers.map.imageSmoothingEnabled     = IMAGE_SMOOTHING;
+        JStick.Viewport.Layers.sprites.imageSmoothingEnabled = IMAGE_SMOOTHING;
+        return true;
+    },
 
     Layers : {
         container :  document.getElementById('container'),
@@ -41,80 +69,93 @@ JStick.Viewport = {
         // window UI (game information, lifes, time etc...)
     },
 
-    Scroll : {
-        get x(){ return SCROLL_X },
-        set x(val){ 
-            // Note: DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
-            // Keeping float values garantees better precision.
-            if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
-            // prevent negative is scroll if disabled
-            if( !JStick.Viewport.Scroll.allowNegativeScrolling && val<0 ) val = 0;
-            // limit maxscroll if scroll width has been set
-            if( JStick.Viewport.Scroll.width!==false){
-                let maxScroll = Math.max( 0, ( (JStick.Viewport.Scroll.width * JStick.Viewport.scale) - JStick.Viewport.width ) / JStick.Viewport.scale );
-                if( val > maxScroll ) val = maxScroll;
-            }
-            SCROLL_X = val;
-            return true;
-        },
-        get y(){ return SCROLL_Y },
-        set y(val){ 
-            // Note DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
-            // Keeping float values garantees better precision.
-            if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
-            // prevent negative is scroll if disabled
-            if( !JStick.Viewport.Scroll.allowNegativeScrolling && val<0 ) val = 0;
-            // limit maxscroll if scroll height has been set
-            if( JStick.Viewport.Scroll.height!==false){
-                let maxScroll = Math.max( 0, ( (JStick.Viewport.Scroll.height * JStick.Viewport.scale) - JStick.Viewport.height ) / JStick.Viewport.scale );
-                if( val > maxScroll ) val = maxScroll;
-            }
-            SCROLL_Y = val ;
-            return true;
-        },
-        width : false,
-        height: false,
-        animate : true,
-        allowNegativeScrolling : false,
-    },
-
-    defineSceneSize(){} , // sets the width and the height of a scene, this values are used for automatic streching and fitting
-
-    get imageSmoothing(){ return IMAGE_SMOOTHING },
-    set imageSmoothing( val ){ 
-        if( typeof val !== 'boolean' ) throw new Error('Scroll value must be a boolean');
-        IMAGE_SMOOTHING = val ;
-        JStick.Viewport.Layers.map.imageSmoothingEnabled     = IMAGE_SMOOTHING;
-        JStick.Viewport.Layers.sprites.imageSmoothingEnabled = IMAGE_SMOOTHING;
+    /*********************************************************************/
+    /*
+    /* SCROLL METHODS AND PROPERTIES
+    /*
+    /*********************************************************************/
+    get scrollX(){ return SCROLL_X },
+    set scrollX(val){ 
+        // Note: DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
+        // Keeping float values garantees better precision.
+        if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
+        // prevent negative is scroll if disabled
+        if( !JStick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
+        // limit maxscroll if scroll width has been set
+        if( JStick.Viewport.scrollWidth!==false){
+            let maxScroll = Math.max( 0, ( (JStick.Viewport.scrollWidth * JStick.Viewport.scale) - JStick.Viewport.width ) / JStick.Viewport.scale );
+            if( val > maxScroll ) val = maxScroll;
+        }
+        SCROLL_X = val;
         return true;
     },
+    get scrollY(){ return SCROLL_Y },
+    set scrollY(val){ 
+        // Note DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
+        // Keeping float values garantees better precision.
+        if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
+        // prevent negative is scroll if disabled
+        if( !JStick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
+        // limit maxscroll if scroll height has been set
+        if( JStick.Viewport.scrollHeight!==false){
+            let maxScroll = Math.max( 0, ( (JStick.Viewport.scrollHeight * JStick.Viewport.scale) - JStick.Viewport.height ) / JStick.Viewport.scale );
+            if( val > maxScroll ) val = maxScroll;
+        }
+        SCROLL_Y = val ;
+        return true;
+    },
+    
+    scrollWidth : false,
+    scrollHeight: false,
+    allowNegativeScrolling : false,
+    
+    scrollAnimation(x,y){
+        TARGET_SCROLL = {
+            x : x,
+            y : y,
+        }
+    },
+
+    /*********************************************************************/
+    /*
+    /* ZOOM (scale) METHODS AND PROPERTIES
+    /*
+    /*********************************************************************/
 
     // allow/disallow scales lower than 1 (scale reduction)
     allowNegativeScale : false,
     // current scale
     scale : 1,
 
-
-
     Zoom : {
         factor  : 0, 
         max     : 2,
         min     : 1,
-        animate : true
     },
     
-    // native cursor
-    set hideDeviceCursor( value ){
-        if (typeof value !== "boolean"){
-            throw new Error('Viewport.deviceCursor() : Argument 1 must be a Boolean');
+    zoomTo( level = 1, x = JStick.Viewport.width/2, y = JStick.Viewport.height/2 ){
+        TARGET_ZOOM = {
+            x : x,
+            y : y,
+            level : level
         }
-
-        if( value ) JStick.Viewport.Layers.container.setAttribute('hide-device-cursor',true);
-        else JStick.Viewport.Layers.container.removeAttribute('hide-device-cursor');
-        HIDE_DEVICE_CURSOR = value;
-        return true;
     },
-    get hideDeviceCursor(){ return HIDE_DEVICE_CURSOR },
+
+    /*********************************************************************/
+    /*
+    /* EVENTS : Custom handlers methods
+    /*
+    /*********************************************************************/
+
+    onresize      : function(){},
+    onloseFPSsync : function(){},
+
+
+
+
+    defineSceneSize(){} , // sets the width and the height of a scene, this values are used for automatic streching and fitting
+
+   
 
 
     /**
@@ -184,8 +225,8 @@ JStick.Viewport = {
         
     
         // calculate the new scroll values
-        JStick.Viewport.Scroll.x += ( TARGET_ZOOM.x / previousScale ) - ( TARGET_ZOOM.x / JStick.Viewport.scale);
-        JStick.Viewport.Scroll.y += ( TARGET_ZOOM.y / previousScale ) - ( TARGET_ZOOM.y / JStick.Viewport.scale);
+        JStick.Viewport.scrollX += ( TARGET_ZOOM.x / previousScale ) - ( TARGET_ZOOM.x / JStick.Viewport.scale);
+        JStick.Viewport.scrollY += ( TARGET_ZOOM.y / previousScale ) - ( TARGET_ZOOM.y / JStick.Viewport.scale);
     
         // apply new scale in a non acumulative way
         JStick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
@@ -199,7 +240,7 @@ JStick.Viewport = {
     },
 
     updateScroll(){
-        if(TARGET_SCROLL && !JStick.Viewport.Scroll.allowNegativeScrolling){
+        if(TARGET_SCROLL && !JStick.Viewport.allowNegativeScrolling){
             if( TARGET_SCROLL.x < 0 ) TARGET_SCROLL.x = 0; 
             if( TARGET_SCROLL.y < 0 ) TARGET_SCROLL.y = 0; 
         }
@@ -216,11 +257,11 @@ JStick.Viewport = {
         if( TARGET_SCROLL.x !== false ){
             if( SCROLL_X < TARGET_SCROLL.x){
                 let target = SCROLL_X + scrollFactor;
-                if( target < TARGET_SCROLL.x ) JStick.Viewport.Scroll.x = target;
+                if( target < TARGET_SCROLL.x ) JStick.Viewport.scrollX = target;
                 else TARGET_SCROLL.x = false;
             }else{
                 let target = SCROLL_X - scrollFactor;
-                if( target > TARGET_SCROLL.x ) JStick.Viewport.Scroll.x = target;
+                if( target > TARGET_SCROLL.x ) JStick.Viewport.scrollX = target;
                 else TARGET_SCROLL.x = false;
             }
         }
@@ -228,11 +269,11 @@ JStick.Viewport = {
         if( TARGET_SCROLL.y !== false ){
             if( SCROLL_Y < TARGET_SCROLL.y){
                 let target = SCROLL_Y + scrollFactor;
-                if( target < TARGET_SCROLL.y ) JStick.Viewport.Scroll.y = target;
+                if( target < TARGET_SCROLL.y ) JStick.Viewport.scrollY = target;
                 else TARGET_SCROLL.y = false;
             }else{
                 let target = SCROLL_Y - scrollFactor;
-                if( target > TARGET_SCROLL.y ) JStick.Viewport.Scroll.y = target;
+                if( target > TARGET_SCROLL.y ) JStick.Viewport.scrollY = target;
                 else TARGET_SCROLL.y = false;
             }
         }
@@ -241,27 +282,9 @@ JStick.Viewport = {
         return true;
     },
 
-    /**
-     * 
-     * Viewport.zoomTo() : With the provided zoom factor, perform a zoom at the provided Viewport coordinates.
-     *                      If no zoom factor is provided use 1 as default value, and if no coordinates
-     *                      are provided use the center of the vieport, as zooming target coordinates
-     * 
-     */
-    zoomTo( level = 1, x = JStick.Viewport.width/2, y = JStick.Viewport.height/2 ){
-        TARGET_ZOOM = {
-            x : x,
-            y : y,
-            level : level
-        }
-    },
+ 
+  
 
-    scrollTo(x,y){
-        TARGET_SCROLL = {
-            x : x,
-            y : y,
-        }
-    }
 }
 
 
