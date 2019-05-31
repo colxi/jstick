@@ -32,7 +32,6 @@ const JStick  = {
 
 
     tick( timestamp=performance.now() ){
-
         JStick.Viewport.updateZoom();
         JStick.Viewport.updateScroll();
         let input = JStick.Input.getStatus();
@@ -45,8 +44,14 @@ const JStick  = {
 
 
     toggle(){
-        // JStick.status = !JStick.status;
-        // JStick.frame();
+        if( JStick.status ){
+            JStick.status = false;
+            JStick.gameLoop.stop();
+        }else{
+            JStick.status = true;
+            JStick.gameLoop.start();
+
+        }
     },
     
     Loop : {
