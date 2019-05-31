@@ -1,5 +1,5 @@
 import {JStick} from './engine/engine-core.js';
-import {throttledAnimation } from './lib/fps-throttle/fps-throttle.js';
+import {throttledAnimation } from './lib/fps-throttle/src/fps-throttle.js';
 
 import './engine/engine-viewport.js';
 import './engine/engine-image.js';

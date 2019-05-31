@@ -1,0 +1,25 @@
+{
+  "name": "fps-throttle",
+  "version": "1.0.2",
+  "homepage": "https://github.com/colxi/fps-throttle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colxi/fps-throttle.git"
+  },
+  "keywords": [
+    "fps throttle",
+    "framerate throttle",
+    "control fps",
+    "frameratelimit"
+  ],
+  "description": "Create animations with limited framerate.",
+  "main": "./src/fps-throttle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "colxi",
+  "license": "MIT",
+  "dependencies": {
+    "fps-observer": "^1.0.1"
+  }
+}
