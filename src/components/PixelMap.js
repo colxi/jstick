@@ -1,4 +1,4 @@
-import {JStick} from '../jstick.js';
+import {Jstick} from '../jstick.js';
 
 
 const PixelMap = /* async */ function( image = '' ){
@@ -13,14 +13,14 @@ const PixelMap = /* async */ function( image = '' ){
         };
 
         // if source is a path, load the image
-        if( typeof image === 'string' ) image = await JStick.Image.load( image );
+        if( typeof image === 'string' ) image = await Jstick.Image.load( image );
 
         
         // convert the bitmap image into a ImageData object (with its internal BufferArray)
         // for easy and fast directo pixel level manipulation
-        let imageData = JStick.Image.imageBitmapToImageData( image );
+        let imageData = Jstick.Image.imageBitmapToImageData( image );
         // When the imageData buffer is ready to be printed, it needs to be converted to a
-        // ImageBitmap in order to be used by JStick.Viewport.Layers.map.drawImage. To perform 
+        // ImageBitmap in order to be used by Jstick.Viewport.Layers.map.drawImage. To perform 
         // this conversion the following  offscreen canvas will be used
         let transferCanvas =  new OffscreenCanvas(image.width,image.height).getContext('2d');
         
@@ -43,7 +43,7 @@ const PixelMap = /* async */ function( image = '' ){
             let imageBitmap = transferCanvas.canvas.transferToImageBitmap();
             // The ImageBitmap interface represents a bitmap image which can be drawn to 
             // a <canvas> without undue latency 
-            JStick.Map.draw( imageBitmap );
+            Jstick.Map.draw( imageBitmap );
         }
         
        return resolve( this);

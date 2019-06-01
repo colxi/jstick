@@ -1,15 +1,15 @@
-import {JStick} from '../jstick.js';
+import {Jstick} from '../jstick.js';
 
 
 
 
-JStick.Map = {
+Jstick.Map = {
     draw( map ){
-        let x1 = ( 0 - JStick.Viewport.scrollX );
-        let y1 = ( 0 - JStick.Viewport.scrollY );
+        let x1 = ( 0 - Jstick.Viewport.scrollX );
+        let y1 = ( 0 - Jstick.Viewport.scrollY );
         let x2 = map.width ;
         let y2 = map.height;
         // Draw map data in canvas
-        JStick.Viewport.Layers.map.drawImage( map, x1, y1, x2, y2 );   
+        Jstick.Viewport.Layers.map.drawImage( map, x1, y1, x2, y2 );   
     }
 };

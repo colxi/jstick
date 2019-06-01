@@ -1,4 +1,4 @@
-import {JStick} from '../jstick.js';
+import {Jstick} from '../Jstick.js';
 
    
 // initiate variables : canvas ref, offsets, scale...
@@ -26,7 +26,36 @@ let IMAGE_SMOOTHING = false;
 // zoom modifier to apply in each step until target zoom is reached
 let ZOOM_MODIFIER = 0.05;
 
-JStick.Viewport = {
+let FOLLOWING = undefined;
+
+Jstick.Camera = {
+    follow( actor ){
+        FOLLOWING = actor;
+    },
+
+    updateFollow(){
+        if(FOLLOWING){
+            let x = FOLLOWING.x - ( Jstick.Viewport.width/(Jstick.Viewport.scale*2) );
+            let y = FOLLOWING.y - ( Jstick.Viewport.height/(Jstick.Viewport.scale*2) );
+            // stabilize vertical scroll
+            if( Math.abs( Jstick.Viewport.scrollY - y ) < 2 ) Jstick.Viewport.scrollAnimation( {x} );
+            else Jstick.Viewport.scrollAnimation( x,y )
+        }
+    },
+
+    zoom       : 1,
+    zoomFactor : 0.5,
+    zoomMin    : 1,
+    zoomMax    : 1,
+    zoomAnimation(){
+
+    },
+    x : 0,
+    y : 0,
+}
+
+
+Jstick.Viewport = {
     /*********************************************************************/
     /*
     /* SIZES AND APPEARENCE PROPERTIES
@@ -42,8 +71,8 @@ JStick.Viewport = {
             throw new Error('Viewport.deviceCursor() : Argument 1 must be a Boolean');
         }
 
-        if( value ) JStick.Viewport.Layers.container.setAttribute('hide-device-cursor',true);
-        else JStick.Viewport.Layers.container.removeAttribute('hide-device-cursor');
+        if( value ) Jstick.Viewport.Layers.container.setAttribute('hide-device-cursor',true);
+        else Jstick.Viewport.Layers.container.removeAttribute('hide-device-cursor');
         HIDE_DEVICE_CURSOR = value;
         return true;
     },
@@ -53,8 +82,8 @@ JStick.Viewport = {
     set imageSmoothing( val ){ 
         if( typeof val !== 'boolean' ) throw new Error('Scroll value must be a boolean');
         IMAGE_SMOOTHING = val ;
-        JStick.Viewport.Layers.map.imageSmoothingEnabled     = IMAGE_SMOOTHING;
-        JStick.Viewport.Layers.sprites.imageSmoothingEnabled = IMAGE_SMOOTHING;
+        Jstick.Viewport.Layers.map.imageSmoothingEnabled     = IMAGE_SMOOTHING;
+        Jstick.Viewport.Layers.sprites.imageSmoothingEnabled = IMAGE_SMOOTHING;
         return true;
     },
 
@@ -80,10 +109,10 @@ JStick.Viewport = {
         // Keeping float values garantees better precision.
         if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
         // prevent negative is scroll if disabled
-        if( !JStick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
+        if( !Jstick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
         // limit maxscroll if scroll width has been set
-        if( JStick.Viewport.scrollWidth!==false){
-            let maxScroll = Math.max( 0, ( (JStick.Viewport.scrollWidth * JStick.Viewport.scale) - JStick.Viewport.width ) / JStick.Viewport.scale );
+        if( Jstick.Viewport.scrollWidth!==false){
+            let maxScroll = Math.max( 0, ( (Jstick.Viewport.scrollWidth * Jstick.Viewport.scale) - Jstick.Viewport.width ) / Jstick.Viewport.scale );
             if( val > maxScroll ) val = maxScroll;
         }
         SCROLL_X = val;
@@ -95,10 +124,10 @@ JStick.Viewport = {
         // Keeping float values garantees better precision.
         if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
         // prevent negative is scroll if disabled
-        if( !JStick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
+        if( !Jstick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
         // limit maxscroll if scroll height has been set
-        if( JStick.Viewport.scrollHeight!==false){
-            let maxScroll = Math.max( 0, ( (JStick.Viewport.scrollHeight * JStick.Viewport.scale) - JStick.Viewport.height ) / JStick.Viewport.scale );
+        if( Jstick.Viewport.scrollHeight!==false){
+            let maxScroll = Math.max( 0, ( (Jstick.Viewport.scrollHeight * Jstick.Viewport.scale) - Jstick.Viewport.height ) / Jstick.Viewport.scale );
             if( val > maxScroll ) val = maxScroll;
         }
         SCROLL_Y = val ;
@@ -110,9 +139,17 @@ JStick.Viewport = {
     allowNegativeScrolling : false,
     
     scrollAnimation(x,y){
+        if( typeof x === 'object'){
+            x = x.x || false;
+            y = x.y || false;
+        }else{
+            x = x || false;
+            y = y || false;
+        }
+
         TARGET_SCROLL = {
-            x : x,
-            y : y,
+            x : x || TARGET_SCROLL.x || Jstick.Viewport.scrollX,
+            y : y || TARGET_SCROLL.y || Jstick.Viewport.scrollY,
         }
     },
 
@@ -133,7 +170,7 @@ JStick.Viewport = {
         min     : 1,
     },
     
-    zoomTo( level = 1, x = JStick.Viewport.width/2, y = JStick.Viewport.height/2 ){
+    zoomTo( level = 1, x = Jstick.Viewport.width/2, y = Jstick.Viewport.height/2 ){
         TARGET_ZOOM = {
             x : x,
             y : y,
@@ -162,24 +199,24 @@ JStick.Viewport = {
      * Viewport.clear() : Clears the Viewport
      */
     clear(){
-        let x2 = ( JStick.Viewport.width / JStick.Viewport.scale );
-        let y2 = ( JStick.Viewport.height / JStick.Viewport.scale );
+        let x2 = ( Jstick.Viewport.width / Jstick.Viewport.scale );
+        let y2 = ( Jstick.Viewport.height / Jstick.Viewport.scale );
 
         // Clean map layer
-        JStick.Viewport.Layers.map.clearRect( 0, 0, x2, y2 );
+        Jstick.Viewport.Layers.map.clearRect( 0, 0, x2, y2 );
         // clean sprites layer
-        JStick.Viewport.Layers.sprites.clearRect( 0, 0, x2, y2 );
+        Jstick.Viewport.Layers.sprites.clearRect( 0, 0, x2, y2 );
         return true;
     },
 
     drawCursor : function(x,y, cursorSprite){     
-        x = ( x / JStick.Viewport.scale ); 
-        y = ( y  / JStick.Viewport.scale );
+        x = ( x / Jstick.Viewport.scale ); 
+        y = ( y  / Jstick.Viewport.scale );
 
         // render cursor
-        JStick.Viewport.Layers.sprites.fillStyle = "#FFFFF";
-        JStick.Viewport.Layers.sprites.fillRect( x - 5, y, 11, 1 );
-        JStick.Viewport.Layers.sprites.fillRect( x, y - 5, 1, 11 );
+        Jstick.Viewport.Layers.sprites.fillStyle = "#FFFFF";
+        Jstick.Viewport.Layers.sprites.fillRect( x - 5, y, 11, 1 );
+        Jstick.Viewport.Layers.sprites.fillRect( x, y - 5, 1, 11 );
         return true;
     },
 
@@ -192,8 +229,8 @@ JStick.Viewport = {
     
     toMapCoordinates( x , y ){
         return [
-            Math.floor( ( x / JStick.Viewport.scale ) + SCROLL_X ) ,
-            Math.floor( ( y / JStick.Viewport.scale ) + SCROLL_Y )
+            Math.floor( ( x / Jstick.Viewport.scale ) + SCROLL_X ) ,
+            Math.floor( ( y / Jstick.Viewport.scale ) + SCROLL_Y )
         ];
     },
     
@@ -201,46 +238,46 @@ JStick.Viewport = {
     updateZoom(){
         if( !TARGET_ZOOM ) return true;
 
-        let previousScale = JStick.Viewport.scale;
+        let previousScale = Jstick.Viewport.scale;
   
         // if Zoom reached the expected level, disable zoom scheduler and return
-        if( JStick.Viewport.scale === TARGET_ZOOM.level  ){
+        if( Jstick.Viewport.scale === TARGET_ZOOM.level  ){
             TARGET_ZOOM = false;
             return;
         }
 
-        if( TARGET_ZOOM.level > JStick.Viewport.scale ){
+        if( TARGET_ZOOM.level > Jstick.Viewport.scale ){
             // ZOM IN, apply a Viewport.scaleStep scale ipncrease
-            JStick.Viewport.scale += ZOOM_MODIFIER;
+            Jstick.Viewport.scale += ZOOM_MODIFIER;
             // if applying increment, zoom level became bigger than target zoom, limit it
-            if( JStick.Viewport.scale > TARGET_ZOOM.level ) JStick.Viewport.scale = TARGET_ZOOM.level;
+            if( Jstick.Viewport.scale > TARGET_ZOOM.level ) Jstick.Viewport.scale = TARGET_ZOOM.level;
         }else{
             // ZOM OUT
-            JStick.Viewport.scale -= ZOOM_MODIFIER;
+            Jstick.Viewport.scale -= ZOOM_MODIFIER;
             // if applying increment, zoom level became bigger than target zoom, limit it
-            if( JStick.Viewport.scale < TARGET_ZOOM.level ) JStick.Viewport.scale = TARGET_ZOOM.level;
+            if( Jstick.Viewport.scale < TARGET_ZOOM.level ) Jstick.Viewport.scale = TARGET_ZOOM.level;
         }
 
-        if( JStick.Viewport.scale < 1 && !JStick.Viewport.allowNegativeScale ) JStick.Viewport.scale = 1;
+        if( Jstick.Viewport.scale < 1 && !Jstick.Viewport.allowNegativeScale ) Jstick.Viewport.scale = 1;
         
     
         // calculate the new scroll values
-        JStick.Viewport.scrollX += ( TARGET_ZOOM.x / previousScale ) - ( TARGET_ZOOM.x / JStick.Viewport.scale);
-        JStick.Viewport.scrollY += ( TARGET_ZOOM.y / previousScale ) - ( TARGET_ZOOM.y / JStick.Viewport.scale);
+        Jstick.Viewport.scrollX += ( TARGET_ZOOM.x / previousScale ) - ( TARGET_ZOOM.x / Jstick.Viewport.scale);
+        Jstick.Viewport.scrollY += ( TARGET_ZOOM.y / previousScale ) - ( TARGET_ZOOM.y / Jstick.Viewport.scale);
     
         // apply new scale in a non acumulative way
-        JStick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
-        JStick.Viewport.Layers.map.scale(JStick.Viewport.scale, JStick.Viewport.scale);
+        Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
+        Jstick.Viewport.Layers.map.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
 
         // apply new scale in a non acumulative way
-        JStick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
-        JStick.Viewport.Layers.sprites.scale(JStick.Viewport.scale, JStick.Viewport.scale);
+        Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
+        Jstick.Viewport.Layers.sprites.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
 
         return true;
     },
 
     updateScroll(){
-        if(TARGET_SCROLL && !JStick.Viewport.allowNegativeScrolling){
+        if(TARGET_SCROLL && !Jstick.Viewport.allowNegativeScrolling){
             if( TARGET_SCROLL.x < 0 ) TARGET_SCROLL.x = 0; 
             if( TARGET_SCROLL.y < 0 ) TARGET_SCROLL.y = 0; 
         }
@@ -257,11 +294,11 @@ JStick.Viewport = {
         if( TARGET_SCROLL.x !== false ){
             if( SCROLL_X < TARGET_SCROLL.x){
                 let target = SCROLL_X + scrollFactor;
-                if( target < TARGET_SCROLL.x ) JStick.Viewport.scrollX = target;
+                if( target < TARGET_SCROLL.x ) Jstick.Viewport.scrollX = target;
                 else TARGET_SCROLL.x = false;
             }else{
                 let target = SCROLL_X - scrollFactor;
-                if( target > TARGET_SCROLL.x ) JStick.Viewport.scrollX = target;
+                if( target > TARGET_SCROLL.x ) Jstick.Viewport.scrollX = target;
                 else TARGET_SCROLL.x = false;
             }
         }
@@ -269,11 +306,11 @@ JStick.Viewport = {
         if( TARGET_SCROLL.y !== false ){
             if( SCROLL_Y < TARGET_SCROLL.y){
                 let target = SCROLL_Y + scrollFactor;
-                if( target < TARGET_SCROLL.y ) JStick.Viewport.scrollY = target;
+                if( target < TARGET_SCROLL.y ) Jstick.Viewport.scrollY = target;
                 else TARGET_SCROLL.y = false;
             }else{
                 let target = SCROLL_Y - scrollFactor;
-                if( target > TARGET_SCROLL.y ) JStick.Viewport.scrollY = target;
+                if( target > TARGET_SCROLL.y ) Jstick.Viewport.scrollY = target;
                 else TARGET_SCROLL.y = false;
             }
         }
@@ -290,25 +327,25 @@ JStick.Viewport = {
 
 
 function onResize(){
-    JStick.Viewport.width = document.getElementById('container').offsetWidth;
-    JStick.Viewport.height = document.getElementById('container').offsetHeight;
+    Jstick.Viewport.width = document.getElementById('container').offsetWidth;
+    Jstick.Viewport.height = document.getElementById('container').offsetHeight;
     
-    document.getElementById('map').width = JStick.Viewport.width;
-    document.getElementById('map').height = JStick.Viewport.height;
+    document.getElementById('map').width = Jstick.Viewport.width;
+    document.getElementById('map').height = Jstick.Viewport.height;
     
-    document.getElementById('sprites').width = JStick.Viewport.width;
-    document.getElementById('sprites').height = JStick.Viewport.height;
+    document.getElementById('sprites').width = Jstick.Viewport.width;
+    document.getElementById('sprites').height = Jstick.Viewport.height;
 
-    JStick.Viewport.Layers.map.imageSmoothingEnabled     = JStick.Viewport.imageSmoothing;
-    JStick.Viewport.Layers.sprites.imageSmoothingEnabled = JStick.Viewport.imageSmoothing;
+    Jstick.Viewport.Layers.map.imageSmoothingEnabled     = Jstick.Viewport.imageSmoothing;
+    Jstick.Viewport.Layers.sprites.imageSmoothingEnabled = Jstick.Viewport.imageSmoothing;
     
     // apply new scale in a non acumulative way
-    JStick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
-    JStick.Viewport.Layers.map.scale(JStick.Viewport.scale, JStick.Viewport.scale);
+    Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
+    Jstick.Viewport.Layers.map.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
 
     // apply new scale in a non acumulative way
-    JStick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
-    JStick.Viewport.Layers.sprites.scale(JStick.Viewport.scale, JStick.Viewport.scale);
+    Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
+    Jstick.Viewport.Layers.sprites.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
 }
 
 window.addEventListener( 'resize' , onResize, false );

@@ -1,7 +1,7 @@
-import {JStick} from '../jstick.js';
+import {Jstick} from '../jstick.js';
 
 
-JStick.Image = {
+Jstick.Image = {
     async load(src){ 
         if( typeof src !== 'string') throw new Error('First argument must be a filepath (string)');
         return new Promise( resolve =>{

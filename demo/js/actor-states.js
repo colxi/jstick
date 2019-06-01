@@ -8,7 +8,7 @@ function checkGroundCollision( sprite ){
 
 function canGoDown( actor ){
     /*
-    JStickAnimations
+    JstickAnimations
     actor.x 
     actor.action.animation.imageBitmap.width + ()
     let bottomX = Math.floor( sprite.x + 5 - (5/2) );

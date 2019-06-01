@@ -6,7 +6,7 @@
  * This code structure can be used as a template reference to implement custom interface controllers.
  * 
  */
-import {JStick} from '../../jstick.js';
+import {Jstick} from '../../jstick.js';
 
 export default {
     // unique name of the controller
@@ -21,12 +21,12 @@ export default {
     //                        inputs and activity. 
     enable(){
         // declare the event listeners related to the interface
-        JStick.Viewport.Layers.container.addEventListener ( 'mousedown', mouseDown, false);
-        JStick.Viewport.Layers.container.addEventListener ( 'mouseup', mouseUp, false );
-        JStick.Viewport.Layers.container.addEventListener ( 'mousemove', mouseMove, false );
+        Jstick.Viewport.Layers.container.addEventListener ( 'mousedown', mouseDown, false);
+        Jstick.Viewport.Layers.container.addEventListener ( 'mouseup', mouseUp, false );
+        Jstick.Viewport.Layers.container.addEventListener ( 'mousemove', mouseMove, false );
         // if required register some interface attributes (interface states)
-        JStick.Input.__registerInterfaceAttribute__( 'MOUSEX' , 0);
-        JStick.Input.__registerInterfaceAttribute__( 'MOUSEY' , 0);
+        Jstick.Input.__registerInterfaceAttribute__( 'MOUSEX' , 0);
+        Jstick.Input.__registerInterfaceAttribute__( 'MOUSEY' , 0);
         return true;
     },
     
@@ -34,12 +34,12 @@ export default {
     //                         undoes the actions of <Interface>.enable()
     disable(){
         // remove event listeners
-        JStick.Viewport.Layers.container.removeEventListener ( 'mousedown', mouseDown ,false);
-        JStick.Viewport.Layers.container.removeEventListener ( 'mouseup', mouseUp ,false);
-        JStick.Viewport.Layers.container.removeEventListener ( 'mousemove', mouseMove, false );
+        Jstick.Viewport.Layers.container.removeEventListener ( 'mousedown', mouseDown ,false);
+        Jstick.Viewport.Layers.container.removeEventListener ( 'mouseup', mouseUp ,false);
+        Jstick.Viewport.Layers.container.removeEventListener ( 'mousemove', mouseMove, false );
         // unregister interface attributes
-        JStick.Input.__unregisterInterfaceAttribute__( 'MOUSEX' , 0);
-        JStick.Input.__unregisterInterfaceAttribute__( 'MOUSEY' , 0);
+        Jstick.Input.__unregisterInterfaceAttribute__( 'MOUSEX' , 0);
+        Jstick.Input.__unregisterInterfaceAttribute__( 'MOUSEY' , 0);
         return true;
     },
 
@@ -60,8 +60,8 @@ function mouseMove(e){
     let x = e.layerX;
     let y = e.layerY;
     // propagate the Signal that updates the Attribute mousex and mousey
-    JStick.Input.__interfaceSignal__( 'MOUSEX' , x , true ); 
-    JStick.Input.__interfaceSignal__( 'MOUSEY' , y , true ); 
+    Jstick.Input.__interfaceSignal__( 'MOUSEX' , x , true ); 
+    Jstick.Input.__interfaceSignal__( 'MOUSEY' , y , true ); 
 };
 
 
@@ -69,14 +69,14 @@ function mouseMove(e){
 function mouseDown(e){
     e.preventDefault();
     let button = e.button;
-    if(button === 0) JStick.Input.__interfaceSignal__( 'MOUSELEFT' , true ); 
-    else if(button === 2)  JStick.Input.__interfaceSignal__( 'MOUSERIGHT' , true );  
+    if(button === 0) Jstick.Input.__interfaceSignal__( 'MOUSELEFT' , true ); 
+    else if(button === 2)  Jstick.Input.__interfaceSignal__( 'MOUSERIGHT' , true );  
 }
 
 // mouseup event handler
 function mouseUp(e){
     e.preventDefault();
     let button  = e.button;
-    if(button === 0) JStick.Input.__interfaceSignal__( 'MOUSELEFT' , false ); 
-    else if(button === 2)  JStick.Input.__interfaceSignal__( 'MOUSERIGHT' , false );  
+    if(button === 0) Jstick.Input.__interfaceSignal__( 'MOUSELEFT' , false ); 
+    else if(button === 2)  Jstick.Input.__interfaceSignal__( 'MOUSERIGHT' , false );  
 }

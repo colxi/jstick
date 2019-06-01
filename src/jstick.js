@@ -1,36 +1,36 @@
 /*
- * Import the main JSTICK container and essential initialization
+ * Import the main Jstick container and essential initialization
  */
-import {JStick} from './engine/engine-core.js';
+import {Jstick} from './engine/engine-core.js';
 
 
 /* 
- * Inject JSTICK.Viewport in the DOM
+ * Inject Jstick.Viewport in the DOM
  */
 import './engine/engine-styles.js';
 
 
 /* 
- * Import the JStick Engine components 
+ * Import the Jstick Engine components 
  */
 
-// declare JSTICK.Viewport
+// declare Jstick.Viewport
 import './engine/engine-viewport.js';
-// declare JSTICK.Image
+// declare Jstick.Image
 import './engine/engine-image.js';
-// declare JSTICK.Map
+// declare Jstick.Map
 import './engine/engine-map.js';
-// declare JSTICK.Input
+// declare Jstick.Input
 import './engine/engine-input.js';
-// declare JSTICK.Sprite
+// declare Jstick.Sprite
 import './engine/engine-sprite.js';
-// declare JSTICK.Cache
+// declare Jstick.Cache
 import './engine/engine-cache.js';
-// declare JSTICK.Loop
+// declare Jstick.Loop
 import './engine/engine-loop.js';
 
 
 /*
  * Done ! ready to export...
  */
- export {JStick};
+ export {Jstick};

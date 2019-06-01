@@ -1,4 +1,4 @@
-import {JStick} from '../../jstick.js';
+import {Jstick} from '../../jstick.js';
 
 export default {
     name    : 'keyboard',
@@ -28,13 +28,13 @@ export default {
 function keyDown(e){
     e.preventDefault();
     let key = e.key.toUpperCase();
-    JStick.Input.__interfaceSignal__( key , true ); 
+    Jstick.Input.__interfaceSignal__( key , true ); 
     return;
 }
 
 function keyUp(e){
     e.preventDefault();
     let key = e.key.toUpperCase();
-    JStick.Input.__interfaceSignal__( key , false ); 
+    Jstick.Input.__interfaceSignal__( key , false ); 
     return;
 }

@@ -1,4 +1,4 @@
-import {JStick} from '../src/jstick.js';
+import {Jstick} from '../src/Jstick.js';
 import {Sprite}    from '../src/components/Sprite.js';
 import {Animation} from '../src/components/Animation.js';
 import {State}     from '../src/components/State.js';
@@ -11,7 +11,7 @@ import {myStates}  from './js/actor-states.js';
 
 
 
-window.JStick = JStick;
+window.Jstick = Jstick;
 
 window.action = 'erase';
 
@@ -19,11 +19,11 @@ let pixelMap;
 let Actors
 
 (async function(){
-    JStick.Viewport.hideDeviceCursor = true;
-    //JStick.Sprite.drawBoundingBoxes  = true;
+    Jstick.Viewport.hideDeviceCursor = true;
+    //Jstick.Sprite.drawBoundingBoxes  = true;
 
     // Load the spritesheet
-    let spriteSheet  = await JStick.Image.load( './spritesheet/lemmings.png' );
+    let spriteSheet  = await Jstick.Image.load( './spritesheet/lemmings.png' );
     // generate walking animation with the walking sprites from spritesheet
     let walkAnimation = new Animation({
         0  : await new Sprite( spriteSheet,  5,  1, 4, 9 ), 
@@ -55,18 +55,21 @@ let Actors
         if( Actors.length > 100 ) clearInterval( interval );
     }, 800);
 
+
+    setTimeout( ()=> Jstick.Camera.follow( Actors[0] ) , 1500 );
+
     // todo: create Scene, add layer (PixelMap) to the scene, pass the scene to the 
     // viewport with config values to allow him to autoadapt 
     pixelMap = await new PixelMap('./maps/map2.png');
     
-    JStick.Viewport.zoomTo(JStick.Viewport.height/pixelMap.height,700,150);
+    Jstick.Viewport.zoomTo(Jstick.Viewport.height/pixelMap.height,700,150);
     
 
-    JStick.Viewport.scrollWidth  =  pixelMap.width;
-    JStick.Viewport.scrollHeight =  pixelMap.height;
+    Jstick.Viewport.scrollWidth  =  pixelMap.width;
+    Jstick.Viewport.scrollHeight =  pixelMap.height;
 
     /** LOOP : UPDATE */
-    JStick.Loop.update = function( deltaTime , input ){
+    Jstick.Loop.update = function( deltaTime , input ){
         document.getElementById('inputMouseCoords').innerHTML = input['MOUSEX'] + '-' + input['MOUSEY'];
         document.getElementById('inputMouseLeft').innerHTML = input['mouse-left'];
         document.getElementById('inputMouseRight').innerHTML = input['mouse-right'];
@@ -82,10 +85,10 @@ let Actors
         if(input['mouse-wheel-up']) setZoom( input.MOUSEX, input.MOUSEY, 1 );
         if(input['mouse-wheel-down']) setZoom( input.MOUSEX, input.MOUSEY, -1 );
         
-        if(input['arrow-right']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX + 10, JStick.Viewport.scrollY );
-        if(input['arrow-left']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX - 10, JStick.Viewport.scrollY );
-        if(input['arrow-up']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX , JStick.Viewport.scrollY - 10 );
-        if(input['arrow-down']) JStick.Viewport.scrollAnimation( JStick.Viewport.scrollX , JStick.Viewport.scrollY + 10 );
+        if(input['arrow-right']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX + 10, Jstick.Viewport.scrollY );
+        if(input['arrow-left']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX - 10, Jstick.Viewport.scrollY );
+        if(input['arrow-up']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX , Jstick.Viewport.scrollY - 10 );
+        if(input['arrow-down']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX , Jstick.Viewport.scrollY + 10 );
         
         if(input['draw-but']) window.action='draw';
         if(input['erase-but']) window.action='erase';
@@ -100,15 +103,15 @@ let Actors
     }
     
     /* LOOP : DRAW */
-    JStick.Loop.draw = function( deltaTime,  input ){
+    Jstick.Loop.draw = function( deltaTime,  input ){
         document.getElementById('actorsCounts').innerHTML = Actors.length;
-        JStick.Viewport.clear();
+        Jstick.Viewport.clear();
         pixelMap.draw( );
 
         // RENDER LAYER :
         for(let i = 0; i < Actors.length; i++) Actors[i].draw();
         // RENDER STAGE :
-        JStick.Viewport.drawCursor( input.MOUSEX, input.MOUSEY );
+        Jstick.Viewport.drawCursor( input.MOUSEX, input.MOUSEY );
 
         return;
     }
@@ -118,22 +121,18 @@ let Actors
 })();
 
 
-
-
-
 function setZoom( x,y,direction ){
-    let newScale= JStick.Viewport.scale + ( 1 * direction );
-    JStick.Viewport.zoomTo(newScale, x , y);
+    let newScale= Jstick.Viewport.scale + ( 1 * direction );
+    Jstick.Viewport.zoomTo(newScale, x , y);
 }
 
 function applyAction(x,y){
-    console.log('action',window.action, x,y)
     if( window.action === 'zoomIn' ){
-        JStick.Viewport.zoomTo( JStick.Viewport.scale + 1 , x , y  )
+        Jstick.Viewport.zoomTo( Jstick.Viewport.scale + 1 , x , y  )
     }else if( window.action === 'zoomOut' ){
-        JStick.Viewport.zoomTo( JStick.Viewport.scale - 1 , x , y  )
+        Jstick.Viewport.zoomTo( Jstick.Viewport.scale - 1 , x , y  )
     }else if( window.action === 'erase' ){
-        [x , y] = JStick.Viewport.toMapCoordinates( x, y );
+        [x , y] = Jstick.Viewport.toMapCoordinates( x, y );
 
         pixelMap.clearPixel(x -1, y -1);
         pixelMap.clearPixel(x +0, y -1);
@@ -147,7 +146,7 @@ function applyAction(x,y){
         pixelMap.clearPixel(x +0, y +1);
         pixelMap.clearPixel(x +1, y +1);
     }else if( window.action === 'draw' ){
-        [x , y] = JStick.Viewport.toMapCoordinates( x, y );
+        [x , y] = Jstick.Viewport.toMapCoordinates( x, y );
 
         pixelMap.setPixel(x -1, y -1, [255,255,255,255]);
         pixelMap.setPixel(x +0, y -1, [255,255,255,255]);

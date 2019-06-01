@@ -1,4 +1,4 @@
-import {JStick} from '../jstick.js';
+import {Jstick} from '../jstick.js';
 import {default as MouseInterface} from './input-interfaces/mouse.js';
 import {default as KeyboardInterface} from './input-interfaces/keyboard.js';
 
@@ -32,7 +32,7 @@ let VIRTUAL_BUTTONS_OLD_STATE = {};
 /* 
     PUBLIC API METHODS 
 */
-JStick.Input = {
+Jstick.Input = {
     /**
      * __interfaceSignal__() : Internal method to recieve signals from the interface modules
      *                         and change the input state
@@ -109,10 +109,10 @@ JStick.Input = {
      *                     module and initializes it.
      */
     async importInterface( iface ){
-        JStick.log('JStick.Input.importInterface() : Importing interface : ', iface);
+        Jstick.log('Jstick.Input.importInterface() : Importing interface : ', iface);
         if( typeof iface !== 'string' || !iface.trim().length ) throw new Error('Interface identifier must be a valid string');
         //if interface has already been imported, return
-        if( !JStick.Input.interfaceExist( iface ) ){
+        if( !Jstick.Input.interfaceExist( iface ) ){
             let ifaceRef = ( await import( './input-interfaces/'+iface ) );
             if( !ifaceRef ) throw new Error('Can\'t find requested interface file: ' + iface );
             if( ifaceRef.hasOwnProperty( 'default') ) throw new Error('Imported interface has bad format : ' + iface );;
@@ -129,12 +129,12 @@ JStick.Input = {
      * 
      */
     enableInterface( iface ){
-        JStick.log('JStick.Input.enableInterface() : Enabling interface : ', iface);
+        Jstick.log('Jstick.Input.enableInterface() : Enabling interface : ', iface);
         if( typeof iface !== 'string' || !iface.trim().length ) throw new Error('Interface identifier must be a valid string');
         // block if interface does not exist
-        if( !JStick.Input.interfaceExist( iface ) ) throw new Error('Unknown interface provided : ' + iface);
+        if( !Jstick.Input.interfaceExist( iface ) ) throw new Error('Unknown interface provided : ' + iface);
         // if interface is not already enabled
-        if( !JStick.Input.isInterfaceEnabled( iface ) ){
+        if( !Jstick.Input.isInterfaceEnabled( iface ) ){
             // validate interface does not provide duplicate signal identifiers
             for(let i= 0; i<INTERFACES[ iface ].signals.length; i++){
                 let currentButton = INTERFACES[ iface ].signals[i];
@@ -158,13 +158,13 @@ JStick.Input = {
      *                      the interface signals.
      */
     disableInterface( iface ){
-        JStick.log('JStick.Input.disableInterface() : Disabling interface : ', iface);
+        Jstick.log('Jstick.Input.disableInterface() : Disabling interface : ', iface);
         if( typeof iface !== 'string' || !iface.trim().length ) throw new Error('Interface identifier must be a valid string');
 
         // block if interface does not exist
-        if( !JStick.Input.interfaceExist( iface ) ) throw new Error('Unknown interface provided : ' + iface);
+        if( !Jstick.Input.interfaceExist( iface ) ) throw new Error('Unknown interface provided : ' + iface);
         // if interface is active...
-        if( JStick.Input.isInterfaceEnabled( iface ) ){ 
+        if( Jstick.Input.isInterfaceEnabled( iface ) ){ 
             let ifaceIndex = INTERFACES_ENABLED.indexOf( iface );
             // unregister all interface signals
             for(let i= 0; i<INTERFACES[ iface ].signals.length; i++){
@@ -216,8 +216,8 @@ JStick.Input = {
         // of SPECIFIC INTERFACE REQUEST
         if( iface ){
             // if interface does not exist, or is disabled throw an error
-            if( !JStick.Input.interfaceExist( iface ) ) throw new Error('Unknown Interface');
-            if( !JStick.Input.isInterfaceEnabled( iface ) ) throw new Error('Interface is disabled : '+ iface);
+            if( !Jstick.Input.interfaceExist( iface ) ) throw new Error('Unknown Interface');
+            if( !Jstick.Input.isInterfaceEnabled( iface ) ) throw new Error('Interface is disabled : '+ iface);
             // else return an array (copy) with the interface signals
             return [...INTERFACES[ iface ].signals ];
         }
@@ -243,7 +243,7 @@ JStick.Input = {
      * registerButton() : Registers a virtual button with a unique id
      */
     registerButton( vButton ){
-        JStick.log('JStick.Input.registerButton() : Registering Game Button : ', vButton);
+        Jstick.log('Jstick.Input.registerButton() : Registering Game Button : ', vButton);
         if( typeof vButton !== 'string' || !vButton.trim().length ) throw new Error('Button identifier must be a valid string');
         // if button is already registered return false
         if( VIRTUAL_BUTTONS_STATE.hasOwnProperty( vButton ) ) return false;
@@ -258,7 +258,7 @@ JStick.Input = {
      *                      activate it
      */
     setButtonMapping( interfaceSignal, vButton ){
-        JStick.log('JStick.Input.setButtonMapping() : Mapping "'+interfaceSignal+'" to game button "'+vButton+'"');
+        Jstick.log('Jstick.Input.setButtonMapping() : Mapping "'+interfaceSignal+'" to game button "'+vButton+'"');
         // error if requested game button does not exist
         if( !VIRTUAL_BUTTONS_STATE.hasOwnProperty( vButton ) ){ 
             throw new Error('Button "'+vButton+'" has not been registered');

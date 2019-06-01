@@ -1,9 +1,9 @@
-import {JStick} from '../jstick.js';
+import {Jstick} from '../Jstick.js';
 import {throttledAnimation } from '../lib/fps-throttle/src/fps-throttle.js';
 
 let GAMELOOP;
 
-JStick.Loop = {
+Jstick.Loop = {
     update(){
         // user provided 
     },
@@ -19,30 +19,31 @@ JStick.Loop = {
     set fps(val){ return val },
 
     pause(){ 
-        JStick.status = false;
+        Jstick.status = false;
         GAMELOOP.stop() 
     },
     
     resume(){ 
         GAMELOOP.start() 
-        JStick.status = true;
+        Jstick.status = true;
     },
 
     nextTick( timestamp=performance.now() ){
-        JStick.Viewport.updateZoom();
-        JStick.Viewport.updateScroll();
-        let input = JStick.Input.getStatus();
-        JStick.Loop.update( timestamp, input );
-        JStick.Loop.draw( timestamp, input );
-        if( JStick.showInfo ) JStick.updateInfo();
+        Jstick.Viewport.updateZoom();
+        Jstick.Viewport.updateScroll();
+        Jstick.Camera.updateFollow();
+        let input = Jstick.Input.getStatus();
+        Jstick.Loop.update( timestamp, input );
+        Jstick.Loop.draw( timestamp, input );
+        if( Jstick.showInfo ) Jstick.updateInfo();
         // reset some possible events like mousewheel
-        JStick.Input.__update__();
+        Jstick.Input.__update__();
     }
 
 }
 
 
 GAMELOOP = new throttledAnimation( (timestamp)=>{
-    if(!JStick.status) return;
-    JStick.Loop.nextTick(timestamp);
+    if(!Jstick.status) return;
+    Jstick.Loop.nextTick(timestamp);
 } , 30 );
