@@ -69,8 +69,9 @@
             <div>
                 Actors : <span id="actorsCounts">---</span>
             </div>
-            <div class="button" onclick="Jstick.toggle()">Pause/Resume</div>
-            <div class="button" onclick="Jstick.tick()">Next Tick</div>
+            <div class="button" onclick="Jstick.status ? Jstick.Loop.pause() : Jstick.Loop.resume()">Pause/Resume</div>
+            <div class="button" onclick="Jstick.Loop.nextTick()">Next Tick</div>
+            <div class="button" onclick="window.action='select'">Select</div>
             <div class="button" onclick="window.action='zoomIn'">Zoom In</div>
             <div class="button" onclick="window.action='zoomOut'">Zoom Out</div>
             <div class="button" onclick="window.action='draw'">Draw</div>

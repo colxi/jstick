@@ -12,10 +12,12 @@ Jstick.Input.registerButton( 'arrow-left' );
 Jstick.Input.registerButton( 'arrow-right' );
 Jstick.Input.registerButton( 'mouse-left' );
 Jstick.Input.registerButton( 'mouse-right' );
+Jstick.Input.registerButton( 'mouse-click' );
 Jstick.Input.registerButton( 'mouse-wheel-up' );
 Jstick.Input.registerButton( 'mouse-wheel-down' );
 
 // map the mouse actions to game  virtual buttons
+Jstick.Input.setButtonMapping( 'MOUSECLICK'     , 'mouse-click' );
 Jstick.Input.setButtonMapping( 'MOUSELEFT'      , 'mouse-left' );
 Jstick.Input.setButtonMapping( 'MOUSERIGHT'     , 'mouse-right' );
 Jstick.Input.setButtonMapping( 'MOUSEWHEELUP'   , 'mouse-wheel-up' );

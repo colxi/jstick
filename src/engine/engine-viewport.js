@@ -224,11 +224,11 @@ Jstick.Viewport = {
 
     /**
      * 
-     * Viewport.getMapCoordinates() : Transform the provided viewport coordinates to map 
-     *                                coordinates, considering map scale and map scroll.
+     * Viewport.getAbsoluteCoordinates() : Transform the provided viewport coordinates to map 
+     *                                absolute coordinates, considering map scale and map scroll.
      */
     
-    toMapCoordinates( x , y ){
+    getAbsoluteCoordinates( x , y ){
         return [
             Math.floor( ( x / Jstick.Viewport.scale ) + SCROLL_X ) ,
             Math.floor( ( y / Jstick.Viewport.scale ) + SCROLL_Y )

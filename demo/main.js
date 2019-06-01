@@ -52,11 +52,10 @@ let Actors
                 }
             }) 
         );
-        if( Actors.length > 100 ) clearInterval( interval );
+        if( Actors.length > 99 ) clearInterval( interval );
     }, 800);
 
 
-    setTimeout( ()=> Jstick.Camera.follow( Actors[0] ) , 1500 );
 
     // todo: create Scene, add layer (PixelMap) to the scene, pass the scene to the 
     // viewport with config values to allow him to autoadapt 
@@ -95,6 +94,8 @@ let Actors
         
         if(input['mouse-left']) applyAction( input.MOUSEX, input.MOUSEY );
 
+        if(input['mouse-click']) detectOnClick( input.MOUSEX, input.MOUSEY );
+
 
         // iterate all actors and update their States
         for(let i = 0; i < Actors.length; i++){ 
@@ -126,13 +127,36 @@ function setZoom( x,y,direction ){
     Jstick.Viewport.zoomTo(newScale, x , y);
 }
 
+
+function detectOnClick(x,y){
+    if( window.action !== 'select' ) return;
+
+    let tolerance = 3;
+    let affected = [];
+    [x,y] = Jstick.Viewport.getAbsoluteCoordinates(x,y);
+    for(let i=0; i<Actors.length; i++){
+        let actor = Actors[i];
+        let box = actor.getBoundingBox();
+        if( x >= box.x-tolerance && y >= box.y-tolerance &&  
+            x <= box.x+box.width+tolerance && y <= box.y + box.height+tolerance ){ 
+                affected.push(actor);
+        }
+    }
+    
+    //
+    if( affected.length ){
+        let random = Math.round( Math.random()  * (affected.length -1) );
+        Jstick.Camera.follow( affected[ random ] )
+    }else Jstick.Camera.follow( false );
+}
+
 function applyAction(x,y){
     if( window.action === 'zoomIn' ){
         Jstick.Viewport.zoomTo( Jstick.Viewport.scale + 1 , x , y  )
     }else if( window.action === 'zoomOut' ){
         Jstick.Viewport.zoomTo( Jstick.Viewport.scale - 1 , x , y  )
     }else if( window.action === 'erase' ){
-        [x , y] = Jstick.Viewport.toMapCoordinates( x, y );
+        [x , y] = Jstick.Viewport.getAbsoluteCoordinates( x, y );
 
         pixelMap.clearPixel(x -1, y -1);
         pixelMap.clearPixel(x +0, y -1);
@@ -146,7 +170,7 @@ function applyAction(x,y){
         pixelMap.clearPixel(x +0, y +1);
         pixelMap.clearPixel(x +1, y +1);
     }else if( window.action === 'draw' ){
-        [x , y] = Jstick.Viewport.toMapCoordinates( x, y );
+        [x , y] = Jstick.Viewport.getAbsoluteCoordinates( x, y );
 
         pixelMap.setPixel(x -1, y -1, [255,255,255,255]);
         pixelMap.setPixel(x +0, y -1, [255,255,255,255]);

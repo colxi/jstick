@@ -2,8 +2,9 @@ import {Jstick} from '../../jstick.js';
 
 export default {
     name    : 'mouse',
-    signals : [ 'MOUSELEFT', 'MOUSERIGHT', 'MOUSEWHEELUP', 'MOUSEWHEELDOWN' ],
+    signals : [ 'MOUSECLICK' , 'MOUSELEFT', 'MOUSERIGHT', 'MOUSEWHEELUP', 'MOUSEWHEELDOWN' ],
     enable(){
+        Jstick.Viewport.Layers.container.addEventListener ( 'click', mouseClick, false);
         Jstick.Viewport.Layers.container.addEventListener ( 'mousedown', mouseDown, false);
         Jstick.Viewport.Layers.container.addEventListener ( 'mouseup', mouseUp, false );
         Jstick.Viewport.Layers.container.addEventListener ( 'mousewheel', mouseWheel, false );
@@ -15,6 +16,7 @@ export default {
         return true;
     },
     disable(){
+        Jstick.Viewport.Layers.container.removeEventListener ( 'click', mouseClick ,false);
         Jstick.Viewport.Layers.container.removeEventListener ( 'mousedown', mouseDown ,false);
         Jstick.Viewport.Layers.container.removeEventListener ( 'mouseup', mouseUp ,false);
         Jstick.Viewport.Layers.container.removeEventListener ( 'mousewheel', mouseWheel ,false);
@@ -26,6 +28,7 @@ export default {
         return true;
     },
     update(){
+        Jstick.Input.__interfaceSignal__( 'MOUSECLICK' , false );
         Jstick.Input.__interfaceSignal__( 'MOUSEWHEELUP' , false );
         Jstick.Input.__interfaceSignal__( 'MOUSEWHEELDOWN' , false );
     },
@@ -40,6 +43,10 @@ function mouseMove(e){
 };
 
 
+function mouseClick(e){
+    e.preventDefault();
+    Jstick.Input.__interfaceSignal__( 'MOUSECLICK' , true ); 
+}
 
 function mouseDown(e){
     e.preventDefault();

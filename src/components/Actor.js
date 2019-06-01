@@ -30,6 +30,16 @@ const Actor =  function( config  ){
 
 }
 
+Actor.prototype.getBoundingBox = function(){
+    let currentSpriteImage = this.getCurrentSprite().image;
+    return {
+        x : this.x, 
+        y : this.y, 
+        width: currentSpriteImage.width, 
+        height: currentSpriteImage.height 
+    }
+}
+
 Actor.prototype.getCurrentSprite = function(){
     return this.__states__[this.state].animation.keyframes[this.__lasAnimationKeyframe__];
 };
