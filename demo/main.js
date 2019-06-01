@@ -1,4 +1,4 @@
-import {Jstick} from '../src/Jstick.js';
+import {Jstick} from '../src/jstick.js';
 import {Sprite}    from '../src/components/Sprite.js';
 import {Animation} from '../src/components/Animation.js';
 import {State}     from '../src/components/State.js';

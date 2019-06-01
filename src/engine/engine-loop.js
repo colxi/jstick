@@ -1,4 +1,4 @@
-import {Jstick} from '../Jstick.js';
+import {Jstick} from '../jstick.js';
 import {throttledAnimation } from '../lib/fps-throttle/src/fps-throttle.js';
 
 let GAMELOOP;

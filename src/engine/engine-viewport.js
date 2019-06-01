@@ -1,4 +1,4 @@
-import {Jstick} from '../Jstick.js';
+import {Jstick} from '../jstick.js';
 
    
 // initiate variables : canvas ref, offsets, scale...
@@ -32,13 +32,14 @@ Jstick.Camera = {
     follow( actor ){
         FOLLOWING = actor;
     },
-
+    followThresholdX : 0,
+    followThresholdY : 2,
     updateFollow(){
         if(FOLLOWING){
             let x = FOLLOWING.x - ( Jstick.Viewport.width/(Jstick.Viewport.scale*2) );
             let y = FOLLOWING.y - ( Jstick.Viewport.height/(Jstick.Viewport.scale*2) );
             // stabilize vertical scroll
-            if( Math.abs( Jstick.Viewport.scrollY - y ) < 2 ) Jstick.Viewport.scrollAnimation( {x} );
+            if( Math.abs( Jstick.Viewport.scrollY - y ) < Jstick.Camera.followThresholdY ) Jstick.Viewport.scrollAnimation( {x} );
             else Jstick.Viewport.scrollAnimation( x,y )
         }
     },
