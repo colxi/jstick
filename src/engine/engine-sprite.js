@@ -55,12 +55,12 @@ Jstick.Sprite = {
         }
         
         // draw axis
-        Jstick.Viewport.Layers.sprites.fillStyle = "#00FFFF";
-        Jstick.Viewport.Layers.sprites.fillRect(lemCenter.x, lemCenter.y,1,5);
+        //Jstick.Viewport.Layers.sprites.fillStyle = "#00FFFF";
+        //Jstick.Viewport.Layers.sprites.fillRect(lemCenter.x, lemCenter.y,1,5);
 
         // draw ground coord
-        Jstick.Viewport.Layers.sprites.fillStyle = "#FF0000";
-        Jstick.Viewport.Layers.sprites.fillRect(lemCenter.x, lemCenter.y,1,1);
+        //Jstick.Viewport.Layers.sprites.fillStyle = "#FF0000";
+        //Jstick.Viewport.Layers.sprites.fillRect(lemCenter.x, lemCenter.y,1,1);
     },
 
     set drawBoundingBoxes( val ){

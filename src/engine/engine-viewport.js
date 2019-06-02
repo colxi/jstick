@@ -215,7 +215,7 @@ Jstick.Viewport = {
         y = ( y  / Jstick.Viewport.scale );
 
         // render cursor
-        Jstick.Viewport.Layers.sprites.fillStyle = "#FFFFF";
+        Jstick.Viewport.Layers.sprites.fillStyle = "#FF0000";
         Jstick.Viewport.Layers.sprites.fillRect( x - 5, y, 11, 1 );
         Jstick.Viewport.Layers.sprites.fillRect( x, y - 5, 1, 11 );
         return true;

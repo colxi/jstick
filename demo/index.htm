@@ -58,9 +58,6 @@
                 FPS : <span id="FPS">---</span>
             </div>
             <div>
-                Map : <span id="mapData">---</span>
-            </div>
-            <div>
                 Scale : <span id="scaleInfo">---</span>
             </div>
             <div>
@@ -71,11 +68,12 @@
             </div>
             <div class="button" onclick="Jstick.status ? Jstick.Loop.pause() : Jstick.Loop.resume()">Pause/Resume</div>
             <div class="button" onclick="Jstick.Loop.nextTick()">Next Tick</div>
-            <div class="button" onclick="window.action='select'">Select</div>
             <div class="button" onclick="window.action='zoomIn'">Zoom In</div>
             <div class="button" onclick="window.action='zoomOut'">Zoom Out</div>
+            <p></p>
             <div class="button" onclick="window.action='draw'">Draw</div>
             <div class="button" onclick="window.action='erase'">Erase</div>
+            <div class="button" onclick="window.action='select'">Select</div>
             <div>Input  :</div>
             <div> - m-pos : <span id="inputMouseCoords">---</span></div>
             <div> - mb-Left : <span id="inputMouseLeft">---</span></div>

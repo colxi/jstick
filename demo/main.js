@@ -17,6 +17,8 @@ window.action = 'erase';
 
 let pixelMap;
 let Actors
+let selectedActor;
+
 
 (async function(){
     Jstick.Viewport.hideDeviceCursor = true;
@@ -25,6 +27,9 @@ let Actors
     // Load the spritesheet
     let spriteSheet  = await Jstick.Image.load( './spritesheet/lemmings.png' );
     // generate walking animation with the walking sprites from spritesheet
+    
+    let cursorSelected =  await new Sprite( spriteSheet,  133,  0, 14, 14 );
+
     let walkAnimation = new Animation({
         0  : await new Sprite( spriteSheet,  5,  1, 4, 9 ), 
         10 : await new Sprite( spriteSheet, 21,  0, 5, 10 ), 
@@ -112,7 +117,17 @@ let Actors
         // RENDER LAYER :
         for(let i = 0; i < Actors.length; i++) Actors[i].draw();
         // RENDER STAGE :
+        if( selectedActor ){ 
+            let box = selectedActor.getBoundingBox();
+            let x =  box.x - Math.round( (cursorSelected.image.width - box.width) / 2);
+            let y =  box.y - Math.round( (cursorSelected.image.height - box.height) / 2);
+            
+            //console.log(cursorSelected,box, box.x, box.y, x, y)
+            Jstick.Sprite.draw( cursorSelected , x, y  );
+        }
         Jstick.Viewport.drawCursor( input.MOUSEX, input.MOUSEY );
+
+
 
         return;
     }
@@ -144,9 +159,11 @@ function detectOnClick(x,y){
     }
     
     //
+    selectedActor = undefined;
     if( affected.length ){
         let random = Math.round( Math.random()  * (affected.length -1) );
-        Jstick.Camera.follow( affected[ random ] )
+        selectedActor = affected[ random ];
+        //Jstick.Camera.follow( selectedActor );
     }else Jstick.Camera.follow( false );
 }
 
