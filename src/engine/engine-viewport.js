@@ -28,12 +28,14 @@ let ZOOM_MODIFIER = 0.05;
 
 let FOLLOWING = undefined;
 
+let SCALE = 1;
+
 Jstick.Camera = {
     follow( actor ){
         FOLLOWING = actor;
     },
-    followThresholdX : 0,
-    followThresholdY : 2,
+    followThresholdX : 5,
+    followThresholdY : 5,
     updateFollow(){
         if(FOLLOWING){
             let x = FOLLOWING.x - ( Jstick.Viewport.width/(Jstick.Viewport.scale*2) );
@@ -109,13 +111,15 @@ Jstick.Viewport = {
         // Note: DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
         // Keeping float values garantees better precision.
         if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
+
         // prevent negative is scroll if disabled
         if( !Jstick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
         // limit maxscroll if scroll width has been set
-        if( Jstick.Viewport.scrollWidth!==false){
+        if( Jstick.Viewport.scrollWidth !== false ){
             let maxScroll = Math.max( 0, ( (Jstick.Viewport.scrollWidth * Jstick.Viewport.scale) - Jstick.Viewport.width ) / Jstick.Viewport.scale );
             if( val > maxScroll ) val = maxScroll;
         }
+
         SCROLL_X = val;
         return true;
     },
@@ -127,7 +131,7 @@ Jstick.Viewport = {
         // prevent negative is scroll if disabled
         if( !Jstick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
         // limit maxscroll if scroll height has been set
-        if( Jstick.Viewport.scrollHeight!==false){
+        if( Jstick.Viewport.scrollHeight !== false){
             let maxScroll = Math.max( 0, ( (Jstick.Viewport.scrollHeight * Jstick.Viewport.scale) - Jstick.Viewport.height ) / Jstick.Viewport.scale );
             if( val > maxScroll ) val = maxScroll;
         }
@@ -163,7 +167,36 @@ Jstick.Viewport = {
     // allow/disallow scales lower than 1 (scale reduction)
     allowNegativeScale : false,
     // current scale
-    scale : 1,
+    get scale(){ return SCALE },
+    set scale(val){ 
+        let previousScale = SCALE;
+
+        // autofit test
+        if( Jstick.Viewport.scrollHeight * val < Jstick.Viewport.height && val < SCALE ){ 
+            TARGET_ZOOM = false;
+            return false;
+        }
+        // .. todo : autofit scrollWidth
+
+        
+        if( SCALE < 1 && !Jstick.Viewport.allowNegativeScale ) SCALE = 1;
+        else SCALE = val;
+
+    
+        let zoomX = TARGET_ZOOM ? TARGET_ZOOM.x : ( Jstick.Viewport.width  / 2);
+        let zoomY = TARGET_ZOOM ? TARGET_ZOOM.y : ( Jstick.Viewport.height / 2);
+        // calculate the new scroll values
+        Jstick.Viewport.scrollX += ( zoomX / previousScale ) - ( zoomX / SCALE );
+        Jstick.Viewport.scrollY += ( zoomY / previousScale ) - ( zoomY / SCALE );
+    
+        // apply new scale  to MAP and SPRITES layers in a non acumulative way
+        Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
+        Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
+        Jstick.Viewport.Layers.map.scale(SCALE, SCALE);
+        Jstick.Viewport.Layers.sprites.scale(SCALE, SCALE);
+
+        return SCALE 
+    },
 
     Zoom : {
         factor  : 0, 
@@ -238,7 +271,31 @@ Jstick.Viewport = {
 
     updateZoom(){
         if( !TARGET_ZOOM ) return true;
+   
+        let newZoom;
+        let currentZoom = Jstick.Viewport.scale;
 
+        // CALCULATE the new ZOOM level value, according to the zoom direction, and 
+        // limit the final value if is bigger than the requested zoom Animation target level
+        if( TARGET_ZOOM.level > currentZoom ){
+            newZoom = currentZoom + ZOOM_MODIFIER;
+            if( newZoom > TARGET_ZOOM.level ){ 
+                newZoom = TARGET_ZOOM.level;
+                TARGET_ZOOM = false;;
+            }
+        }else{
+            newZoom = currentZoom - ZOOM_MODIFIER;
+            if( newZoom < TARGET_ZOOM.level ){
+                newZoom = TARGET_ZOOM.level;
+                TARGET_ZOOM = false;;
+            }
+        }
+        
+        Jstick.Viewport.scale = newZoom;
+
+        return;
+        // ------------------------------------
+        // bkp 
         let previousScale = Jstick.Viewport.scale;
   
         // if Zoom reached the expected level, disable zoom scheduler and return

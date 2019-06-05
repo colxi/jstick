@@ -163,7 +163,7 @@ function detectOnClick(x,y){
     if( affected.length ){
         let random = Math.round( Math.random()  * (affected.length -1) );
         selectedActor = affected[ random ];
-        //Jstick.Camera.follow( selectedActor );
+        Jstick.Camera.follow( selectedActor );
     }else Jstick.Camera.follow( false );
 }
 

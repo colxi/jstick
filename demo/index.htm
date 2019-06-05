@@ -48,6 +48,10 @@
                 padding: 2px 5px;
                 cursor: pointer;
             }
+            .action{
+                color: white;
+                background: orangered;
+            }
         </style>
         <script src="./main.js" type="module"></script>
         <meta name="viewport" content="width=device-width, user-scalable=no">
@@ -86,6 +90,16 @@
             <div> - DOWN : <span id="inputKeybArrowDown">---</span></div>
             <div> - LEFT : <span id="inputKeybArrowLeft">---</span></div>
             <div> - RIGHT : <span id="inputKeybArrowRight">---</span></div>
+            <p></p>
+            <div class="button action" onclick="window.action='climb'">CLIMB</div>
+            <div class="button action" onclick="window.action='float'">FLOAT</div>
+            <div class="button action" onclick="window.action='bomb'">BOMB</div>
+            <div class="button action" onclick="window.action='block'">BLOCK</div>
+            <div class="button action" onclick="window.action='build'">BUILD</div>
+            <div class="button action" onclick="window.action='dig-h'">DIG-H</div>
+            <div class="button action" onclick="window.action='dig-v'">DIG-V</div>
+            <div class="button action" onclick="window.action='mine'">MINE</div>
+
         </div>
         <div id="container">
             <canvas id="map" width="1087" height="319" ></canvas>
