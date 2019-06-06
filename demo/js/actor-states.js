@@ -36,6 +36,49 @@ let myStates = {
         }
 
     },
+    tunnel(lem, pixelMap){
+        // block if empty under the lemming
+        if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)+1) &&
+        pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.attributes.direction), groundY(lem)+1) &&
+        pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.attributes.direction), groundY(lem)+1) ){
+            lem.setState('fall');
+            return;
+        }
+
+        if( lem.__stateTick__ % 10 === 0 ){
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 0 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 1 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 2 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 3 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 4 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 5 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 6 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 7 );
+            pixelMap.clearPixel(lem.x + 5 , lem.y + 8 );
+            lem.x++;
+        }
+
+    },
+    dig(lem, pixelMap){
+        // block if empty under the lemming
+        if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)+1) &&
+        pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.attributes.direction), groundY(lem)+1) &&
+        pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.attributes.direction), groundY(lem)+1) ){
+            lem.setState('fall');
+            return;
+        }
+
+        if( lem.__stateTick__ % 10 === 0 ){
+            pixelMap.clearPixel(lem.x , groundY(lem)+1 );
+            pixelMap.clearPixel(lem.x +1, groundY(lem)+1 );
+            pixelMap.clearPixel(lem.x +2, groundY(lem)+1 );
+            pixelMap.clearPixel(lem.x +3, groundY(lem)+1 );
+            pixelMap.clearPixel(lem.x +4, groundY(lem)+1 );
+            pixelMap.clearPixel(lem.x +5, groundY(lem)+1 );
+            lem.y++;
+        }
+             
+    },
     walk(lem, pixelMap){
         if(lem.actionTick % 3) return;
         lem.x  = lem.x + ( .5 * lem.attributes.direction );

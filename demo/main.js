@@ -42,13 +42,15 @@ let selectedActor;
     } , 80 , true ); 
 
     let walkState = new State( 'walk', walkAnimation, myStates.walk );
-    let fallState = new State( 'fall',  walkAnimation, myStates.fall );
+    let fallState = new State( 'fall', walkAnimation, myStates.fall );
+    let digState  = new State( 'dig',  walkAnimation, myStates.dig );
+    let tunnelState  = new State( 'tunnel',  walkAnimation, myStates.tunnel );
 
     Actors = [];
     let interval = setInterval( ()=>{
         Actors.push(
             new Actor({
-                states : [walkState, fallState],
+                states : [walkState, fallState, digState, tunnelState],
                 state  : 'walk',
                 x      : 470,
                 y      : 102,
@@ -99,7 +101,7 @@ let selectedActor;
         
         if(input['mouse-left']) applyAction( input.MOUSEX, input.MOUSEY );
 
-        if(input['mouse-click']) detectOnClick( input.MOUSEX, input.MOUSEY );
+        if(input['mouse-click']) onClick( input.MOUSEX, input.MOUSEY );
 
 
         // iterate all actors and update their States
@@ -142,10 +144,7 @@ function setZoom( x,y,direction ){
     Jstick.Viewport.zoomTo(newScale, x , y);
 }
 
-
-function detectOnClick(x,y){
-    if( window.action !== 'select' ) return;
-
+function actorsAtCoords(x,y, single=false){
     let tolerance = 3;
     let affected = [];
     [x,y] = Jstick.Viewport.getAbsoluteCoordinates(x,y);
@@ -157,14 +156,28 @@ function detectOnClick(x,y){
                 affected.push(actor);
         }
     }
-    
-    //
-    selectedActor = undefined;
-    if( affected.length ){
-        let random = Math.round( Math.random()  * (affected.length -1) );
-        selectedActor = affected[ random ];
-        Jstick.Camera.follow( selectedActor );
-    }else Jstick.Camera.follow( false );
+    if( single && affected.length ) return [ affected[ Math.round( Math.random() * (affected.length -1) ) ] ];
+    else return affected;
+}
+
+function onClick(x,y){
+    if( window.action === 'select' ){
+        let affected = actorsAtCoords(x,y, true);
+        if( affected.length ){ 
+            Jstick.Camera.follow( affected[ 0 ] );
+            selectedActor = affected[ 0 ];
+        }
+        else{ 
+            Jstick.Camera.follow( false );
+            selectedActor = false;
+        }
+    }else if( window.action === 'dig'){
+        let affected = actorsAtCoords(x,y, true);
+        if( affected.length ) affected[ 0 ].setState('dig');
+    }else if( window.action === 'tunnel'){
+        let affected = actorsAtCoords(x,y, true);
+        if( affected.length ) affected[ 0 ].setState('tunnel');
+    }
 }
 
 function applyAction(x,y){
