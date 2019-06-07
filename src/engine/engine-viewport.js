@@ -3,31 +3,32 @@ import {Jstick} from '../jstick.js';
    
 // initiate variables : canvas ref, offsets, scale...
 
+
+
+let HIDE_DEVICE_CURSOR = false;
+
+
+let IMAGE_SMOOTHING = false;
+
+
+
+
 let TARGET_ZOOM = false ; /* {
     x : 0,
     y : 0,
     level : 0
 }
 */
-
 let TARGET_SCROLL = false; /*{
     x : 0,
     y : 0
 }
 */
-
-let HIDE_DEVICE_CURSOR = false;
-
 let SCROLL_X = 0;
 let SCROLL_Y = 0;
-
-let IMAGE_SMOOTHING = false;
-
 // zoom modifier to apply in each step until target zoom is reached
 let ZOOM_MODIFIER = 0.05;
-
 let FOLLOWING = undefined;
-
 let SCALE = 1;
 
 Jstick.Camera = {
@@ -38,23 +39,201 @@ Jstick.Camera = {
     followThresholdY : 5,
     updateFollow(){
         if(FOLLOWING){
-            let x = FOLLOWING.x - ( Jstick.Viewport.width/(Jstick.Viewport.scale*2) );
-            let y = FOLLOWING.y - ( Jstick.Viewport.height/(Jstick.Viewport.scale*2) );
+            let x = FOLLOWING.x - ( Jstick.Viewport.width/(Jstick.Camera.zoom*2) );
+            let y = FOLLOWING.y - ( Jstick.Viewport.height/(Jstick.Camera.zoom*2) );
             // stabilize vertical scroll
-            if( Math.abs( Jstick.Viewport.scrollY - y ) < Jstick.Camera.followThresholdY ) Jstick.Viewport.scrollAnimation( {x} );
-            else Jstick.Viewport.scrollAnimation( x,y )
+            if( Math.abs( Jstick.Camera.y - y ) < Jstick.Camera.followThresholdY ) Jstick.Camera.scrollAnimation( {x} );
+            else Jstick.Camera.scrollAnimation( x,y )
         }
     },
 
-    zoom       : 1,
-    zoomFactor : 0.5,
+
+    /*********************************************************************/
+    /*
+    /* SCROLL METHODS AND PROPERTIES
+    /*
+    /*********************************************************************/
+    get x(){ return SCROLL_X },
+    set x(val){ 
+        // Note: DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
+        // Keeping float values garantees better precision.
+        if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
+
+        // prevent negative is scroll if disabled
+        if( !Jstick.Camera.allowNegativeScrolling && val<0 ) val = 0;
+        // limit maxscroll if scroll width has been set
+        if( Jstick.Camera.scrollWidth !== false ){
+            let maxScroll = Math.max( 0, ( (Jstick.Camera.scrollWidth * Jstick.Camera.zoom) - Jstick.Viewport.width ) / Jstick.Camera.zoom );
+            if( val > maxScroll ) val = maxScroll;
+        }
+
+        SCROLL_X = val;
+        return true;
+    },
+    get y(){ return SCROLL_Y },
+    set y(val){ 
+        // Note DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
+        // Keeping float values garantees better precision.
+        if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
+        // prevent negative is scroll if disabled
+        if( !Jstick.Camera.allowNegativeScrolling && val<0 ) val = 0;
+        // limit maxscroll if scroll height has been set
+        if( Jstick.Camera.scrollHeight !== false){
+            let maxScroll = Math.max( 0, ( (Jstick.Camera.scrollHeight * Jstick.Camera.zoom) - Jstick.Viewport.height ) / Jstick.Camera.zoom );
+            if( val > maxScroll ) val = maxScroll;
+        }
+        SCROLL_Y = val ;
+        return true;
+    },
+
+    scrollWidth : false,
+    scrollHeight: false,
+    allowNegativeScrolling : false,
+    limitToBoundaries : true,
+    
+    scrollAnimation(x,y){
+        if( typeof x === 'object'){
+            x = x.x || false;
+            y = x.y || false;
+        }else{
+            x = x || false;
+            y = y || false;
+        }
+
+        TARGET_SCROLL = {
+            x : x || TARGET_SCROLL.x || Jstick.Camera.x,
+            y : y || TARGET_SCROLL.y || Jstick.Camera.y,
+        }
+    },
+
+    /*********************************************************************/
+    /*
+    /* ZOOM (scale) METHODS AND PROPERTIES
+    /*
+    /*********************************************************************/
+
+    get zoom(){ return SCALE },
+    set zoom(val){ 
+        let previousScale = SCALE;
+
+        // autofit test
+        if( Jstick.Camera.scrollHeight * val < Jstick.Viewport.height && val < SCALE ){ 
+            TARGET_ZOOM = false;
+            return false;
+        }
+        // .. todo : autofit scrollWidth
+
+        
+        if( SCALE < 1 && !Jstick.Camera.allowNegativeZoom ) SCALE = 1;
+        else SCALE = val;
+
+    
+        let zoomX = TARGET_ZOOM ? TARGET_ZOOM.x : ( Jstick.Viewport.width  / 2);
+        let zoomY = TARGET_ZOOM ? TARGET_ZOOM.y : ( Jstick.Viewport.height / 2);
+        // calculate the new scroll values
+        Jstick.Camera.x += ( zoomX / previousScale ) - ( zoomX / SCALE );
+        Jstick.Camera.y += ( zoomY / previousScale ) - ( zoomY / SCALE );
+    
+        // apply new scale  to MAP and SPRITES layers in a non acumulative way
+        Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
+        Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
+        Jstick.Viewport.Layers.map.scale(SCALE, SCALE);
+        Jstick.Viewport.Layers.sprites.scale(SCALE, SCALE);
+
+        return SCALE 
+    },
+
+    get zoomFactor(){ return ZOOM_MODIFIER },
+    set zoomFactor(val){
+        ZOOM_MODIFIER = val; 
+        return true; 
+    },
+
+    allowNegativeZoom : false,
     zoomMin    : 1,
     zoomMax    : 1,
-    zoomAnimation(){
 
+    zoomAnimation( level = 1, x = Jstick.Viewport.width/2, y = Jstick.Viewport.height/2 ){
+        TARGET_ZOOM = {
+            x : x,
+            y : y,
+            level : level
+        }
     },
-    x : 0,
-    y : 0,
+
+
+    
+    updateZoom(){
+        if( !TARGET_ZOOM ) return true;
+   
+        let newZoom;
+        let currentZoom = Jstick.Camera.zoom;
+
+        // CALCULATE the new ZOOM level value, according to the zoom direction, and 
+        // limit the final value if is bigger than the requested zoom Animation target level
+        if( TARGET_ZOOM.level > currentZoom ){
+            newZoom = currentZoom + ZOOM_MODIFIER;
+            if( newZoom > TARGET_ZOOM.level ){ 
+                newZoom = TARGET_ZOOM.level;
+                TARGET_ZOOM = false;;
+            }
+        }else{
+            newZoom = currentZoom - ZOOM_MODIFIER;
+            if( newZoom < TARGET_ZOOM.level ){
+                newZoom = TARGET_ZOOM.level;
+                TARGET_ZOOM = false;;
+            }
+        }
+        
+        Jstick.Camera.zoom = newZoom;
+
+        return;
+    
+    },
+
+    updateScroll(){
+        if(TARGET_SCROLL && !Jstick.Camera.allowNegativeScrolling){
+            if( TARGET_SCROLL.x < 0 ) TARGET_SCROLL.x = 0; 
+            if( TARGET_SCROLL.y < 0 ) TARGET_SCROLL.y = 0; 
+        }
+
+        // perform  SCALE update if is scheduled
+        if( !TARGET_SCROLL ) return;
+        if( TARGET_SCROLL.x === false && TARGET_SCROLL.y === false ){
+            TARGET_SCROLL = false;
+            return;
+        }
+
+        let scrollFactor = 2;
+
+        if( TARGET_SCROLL.x !== false ){
+            if( SCROLL_X < TARGET_SCROLL.x){
+                let target = SCROLL_X + scrollFactor;
+                if( target < TARGET_SCROLL.x ) Jstick.Camera.x = target;
+                else TARGET_SCROLL.x = false;
+            }else{
+                let target = SCROLL_X - scrollFactor;
+                if( target > TARGET_SCROLL.x ) Jstick.Camera.x = target;
+                else TARGET_SCROLL.x = false;
+            }
+        }
+
+        if( TARGET_SCROLL.y !== false ){
+            if( SCROLL_Y < TARGET_SCROLL.y){
+                let target = SCROLL_Y + scrollFactor;
+                if( target < TARGET_SCROLL.y ) Jstick.Camera.y = target;
+                else TARGET_SCROLL.y = false;
+            }else{
+                let target = SCROLL_Y - scrollFactor;
+                if( target > TARGET_SCROLL.y ) Jstick.Camera.y = target;
+                else TARGET_SCROLL.y = false;
+            }
+        }
+
+
+        return true;
+    },
+
 }
 
 
@@ -101,116 +280,10 @@ Jstick.Viewport = {
         // window UI (game information, lifes, time etc...)
     },
 
-    /*********************************************************************/
-    /*
-    /* SCROLL METHODS AND PROPERTIES
-    /*
-    /*********************************************************************/
-    get scrollX(){ return SCROLL_X },
-    set scrollX(val){ 
-        // Note: DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
-        // Keeping float values garantees better precision.
-        if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
 
-        // prevent negative is scroll if disabled
-        if( !Jstick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
-        // limit maxscroll if scroll width has been set
-        if( Jstick.Viewport.scrollWidth !== false ){
-            let maxScroll = Math.max( 0, ( (Jstick.Viewport.scrollWidth * Jstick.Viewport.scale) - Jstick.Viewport.width ) / Jstick.Viewport.scale );
-            if( val > maxScroll ) val = maxScroll;
-        }
+ 
 
-        SCROLL_X = val;
-        return true;
-    },
-    get scrollY(){ return SCROLL_Y },
-    set scrollY(val){ 
-        // Note DONT ROUND.If scroll value is rounded, loses resolution in high scaled canvases. 
-        // Keeping float values garantees better precision.
-        if( typeof val !== 'number' ) throw new Error('Scroll value must be a number');
-        // prevent negative is scroll if disabled
-        if( !Jstick.Viewport.allowNegativeScrolling && val<0 ) val = 0;
-        // limit maxscroll if scroll height has been set
-        if( Jstick.Viewport.scrollHeight !== false){
-            let maxScroll = Math.max( 0, ( (Jstick.Viewport.scrollHeight * Jstick.Viewport.scale) - Jstick.Viewport.height ) / Jstick.Viewport.scale );
-            if( val > maxScroll ) val = maxScroll;
-        }
-        SCROLL_Y = val ;
-        return true;
-    },
-    
-    scrollWidth : false,
-    scrollHeight: false,
-    allowNegativeScrolling : false,
-    
-    scrollAnimation(x,y){
-        if( typeof x === 'object'){
-            x = x.x || false;
-            y = x.y || false;
-        }else{
-            x = x || false;
-            y = y || false;
-        }
-
-        TARGET_SCROLL = {
-            x : x || TARGET_SCROLL.x || Jstick.Viewport.scrollX,
-            y : y || TARGET_SCROLL.y || Jstick.Viewport.scrollY,
-        }
-    },
-
-    /*********************************************************************/
-    /*
-    /* ZOOM (scale) METHODS AND PROPERTIES
-    /*
-    /*********************************************************************/
-
-    // allow/disallow scales lower than 1 (scale reduction)
-    allowNegativeScale : false,
-    // current scale
-    get scale(){ return SCALE },
-    set scale(val){ 
-        let previousScale = SCALE;
-
-        // autofit test
-        if( Jstick.Viewport.scrollHeight * val < Jstick.Viewport.height && val < SCALE ){ 
-            TARGET_ZOOM = false;
-            return false;
-        }
-        // .. todo : autofit scrollWidth
-
-        
-        if( SCALE < 1 && !Jstick.Viewport.allowNegativeScale ) SCALE = 1;
-        else SCALE = val;
-
-    
-        let zoomX = TARGET_ZOOM ? TARGET_ZOOM.x : ( Jstick.Viewport.width  / 2);
-        let zoomY = TARGET_ZOOM ? TARGET_ZOOM.y : ( Jstick.Viewport.height / 2);
-        // calculate the new scroll values
-        Jstick.Viewport.scrollX += ( zoomX / previousScale ) - ( zoomX / SCALE );
-        Jstick.Viewport.scrollY += ( zoomY / previousScale ) - ( zoomY / SCALE );
-    
-        // apply new scale  to MAP and SPRITES layers in a non acumulative way
-        Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
-        Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
-        Jstick.Viewport.Layers.map.scale(SCALE, SCALE);
-        Jstick.Viewport.Layers.sprites.scale(SCALE, SCALE);
-
-        return SCALE 
-    },
-
-    Zoom : {
-        factor  : 0, 
-        max     : 2,
-        min     : 1,
-    },
-    
-    zoomTo( level = 1, x = Jstick.Viewport.width/2, y = Jstick.Viewport.height/2 ){
-        TARGET_ZOOM = {
-            x : x,
-            y : y,
-            level : level
-        }
-    },
+  
 
     /*********************************************************************/
     /*
@@ -222,19 +295,12 @@ Jstick.Viewport = {
     onloseFPSsync : function(){},
 
 
-
-
-    defineSceneSize(){} , // sets the width and the height of a scene, this values are used for automatic streching and fitting
-
-   
-
-
     /**
      * Viewport.clear() : Clears the Viewport
      */
     clear(){
-        let x2 = ( Jstick.Viewport.width / Jstick.Viewport.scale );
-        let y2 = ( Jstick.Viewport.height / Jstick.Viewport.scale );
+        let x2 = ( Jstick.Viewport.width / Jstick.Camera.zoom );
+        let y2 = ( Jstick.Viewport.height / Jstick.Camera.zoom );
 
         // Clean map layer
         Jstick.Viewport.Layers.map.clearRect( 0, 0, x2, y2 );
@@ -243,16 +309,7 @@ Jstick.Viewport = {
         return true;
     },
 
-    drawCursor : function(x,y, cursorSprite){     
-        x = ( x / Jstick.Viewport.scale ); 
-        y = ( y  / Jstick.Viewport.scale );
-
-        // render cursor
-        Jstick.Viewport.Layers.sprites.fillStyle = "#FF0000";
-        Jstick.Viewport.Layers.sprites.fillRect( x - 5, y, 11, 1 );
-        Jstick.Viewport.Layers.sprites.fillRect( x, y - 5, 1, 11 );
-        return true;
-    },
+ 
 
 
     /**
@@ -263,119 +320,11 @@ Jstick.Viewport = {
     
     getAbsoluteCoordinates( x , y ){
         return [
-            Math.floor( ( x / Jstick.Viewport.scale ) + SCROLL_X ) ,
-            Math.floor( ( y / Jstick.Viewport.scale ) + SCROLL_Y )
+            Math.floor( ( x / Jstick.Camera.zoom ) + SCROLL_X ) ,
+            Math.floor( ( y / Jstick.Camera.zoom ) + SCROLL_Y )
         ];
     },
     
-
-    updateZoom(){
-        if( !TARGET_ZOOM ) return true;
-   
-        let newZoom;
-        let currentZoom = Jstick.Viewport.scale;
-
-        // CALCULATE the new ZOOM level value, according to the zoom direction, and 
-        // limit the final value if is bigger than the requested zoom Animation target level
-        if( TARGET_ZOOM.level > currentZoom ){
-            newZoom = currentZoom + ZOOM_MODIFIER;
-            if( newZoom > TARGET_ZOOM.level ){ 
-                newZoom = TARGET_ZOOM.level;
-                TARGET_ZOOM = false;;
-            }
-        }else{
-            newZoom = currentZoom - ZOOM_MODIFIER;
-            if( newZoom < TARGET_ZOOM.level ){
-                newZoom = TARGET_ZOOM.level;
-                TARGET_ZOOM = false;;
-            }
-        }
-        
-        Jstick.Viewport.scale = newZoom;
-
-        return;
-        // ------------------------------------
-        // bkp 
-        let previousScale = Jstick.Viewport.scale;
-  
-        // if Zoom reached the expected level, disable zoom scheduler and return
-        if( Jstick.Viewport.scale === TARGET_ZOOM.level  ){
-            TARGET_ZOOM = false;
-            return;
-        }
-
-        if( TARGET_ZOOM.level > Jstick.Viewport.scale ){
-            // ZOM IN, apply a Viewport.scaleStep scale ipncrease
-            Jstick.Viewport.scale += ZOOM_MODIFIER;
-            // if applying increment, zoom level became bigger than target zoom, limit it
-            if( Jstick.Viewport.scale > TARGET_ZOOM.level ) Jstick.Viewport.scale = TARGET_ZOOM.level;
-        }else{
-            // ZOM OUT
-            Jstick.Viewport.scale -= ZOOM_MODIFIER;
-            // if applying increment, zoom level became bigger than target zoom, limit it
-            if( Jstick.Viewport.scale < TARGET_ZOOM.level ) Jstick.Viewport.scale = TARGET_ZOOM.level;
-        }
-
-        if( Jstick.Viewport.scale < 1 && !Jstick.Viewport.allowNegativeScale ) Jstick.Viewport.scale = 1;
-        
-    
-        // calculate the new scroll values
-        Jstick.Viewport.scrollX += ( TARGET_ZOOM.x / previousScale ) - ( TARGET_ZOOM.x / Jstick.Viewport.scale);
-        Jstick.Viewport.scrollY += ( TARGET_ZOOM.y / previousScale ) - ( TARGET_ZOOM.y / Jstick.Viewport.scale);
-    
-        // apply new scale in a non acumulative way
-        Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
-        Jstick.Viewport.Layers.map.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
-
-        // apply new scale in a non acumulative way
-        Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
-        Jstick.Viewport.Layers.sprites.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
-
-        return true;
-    },
-
-    updateScroll(){
-        if(TARGET_SCROLL && !Jstick.Viewport.allowNegativeScrolling){
-            if( TARGET_SCROLL.x < 0 ) TARGET_SCROLL.x = 0; 
-            if( TARGET_SCROLL.y < 0 ) TARGET_SCROLL.y = 0; 
-        }
-
-        // perform  SCALE update if is scheduled
-        if( !TARGET_SCROLL ) return;
-        if( TARGET_SCROLL.x === false && TARGET_SCROLL.y === false ){
-            TARGET_SCROLL = false;
-            return;
-        }
-
-        let scrollFactor = 2;
-
-        if( TARGET_SCROLL.x !== false ){
-            if( SCROLL_X < TARGET_SCROLL.x){
-                let target = SCROLL_X + scrollFactor;
-                if( target < TARGET_SCROLL.x ) Jstick.Viewport.scrollX = target;
-                else TARGET_SCROLL.x = false;
-            }else{
-                let target = SCROLL_X - scrollFactor;
-                if( target > TARGET_SCROLL.x ) Jstick.Viewport.scrollX = target;
-                else TARGET_SCROLL.x = false;
-            }
-        }
-
-        if( TARGET_SCROLL.y !== false ){
-            if( SCROLL_Y < TARGET_SCROLL.y){
-                let target = SCROLL_Y + scrollFactor;
-                if( target < TARGET_SCROLL.y ) Jstick.Viewport.scrollY = target;
-                else TARGET_SCROLL.y = false;
-            }else{
-                let target = SCROLL_Y - scrollFactor;
-                if( target > TARGET_SCROLL.y ) Jstick.Viewport.scrollY = target;
-                else TARGET_SCROLL.y = false;
-            }
-        }
-
-
-        return true;
-    },
 
  
   
@@ -399,11 +348,11 @@ function onResize(){
     
     // apply new scale in a non acumulative way
     Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
-    Jstick.Viewport.Layers.map.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
+    Jstick.Viewport.Layers.map.scale(Jstick.Camera.zoom, Jstick.Camera.zoom);
 
     // apply new scale in a non acumulative way
     Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
-    Jstick.Viewport.Layers.sprites.scale(Jstick.Viewport.scale, Jstick.Viewport.scale);
+    Jstick.Viewport.Layers.sprites.scale(Jstick.Camera.zoom, Jstick.Camera.zoom);
 }
 
 window.addEventListener( 'resize' , onResize, false );

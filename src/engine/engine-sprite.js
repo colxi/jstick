@@ -39,19 +39,19 @@ Jstick.Sprite = {
         // Viewport scroll 
         Jstick.Viewport.Layers.sprites.drawImage( 
             image , 
-            ( x - Jstick.Viewport.scrollX ), 
-            ( y - Jstick.Viewport.scrollY ), 
+            ( x - Jstick.Camera.x ), 
+            ( y - Jstick.Camera.y ), 
             image.width, 
             image.height
         );
 
         let lemCenter = {
-            x : x + image.width  - 3 - Jstick.Viewport.scrollX,
-            y : y + image.height - 1 - Jstick.Viewport.scrollY,
+            x : x + image.width  - 3 - Jstick.Camera.x,
+            y : y + image.height - 1 - Jstick.Camera.y,
         }
         if( BOUNDING_BOXES ){
             Jstick.Viewport.Layers.sprites.strokeStyle = "#FF0000";
-            Jstick.Viewport.Layers.sprites.strokeRect(x- Jstick.Viewport.scrollX, y- Jstick.Viewport.scrollY,image.width,image.height);
+            Jstick.Viewport.Layers.sprites.strokeRect(x- Jstick.Camera.x, y- Jstick.Camera.y,image.width,image.height);
         }
         
         // draw axis

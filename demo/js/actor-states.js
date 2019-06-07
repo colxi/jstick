@@ -27,6 +27,17 @@ function groundX(lem){ return Math.floor( lem.x + 5 - (5/2) ) };
 function groundY(lem){ return Math.floor( lem.y + 9 - 1 ) }
 
 let myStates = {
+    block(lem, pixelMap){
+        if( lem.__stateTick__ === 1 ){
+            console.log('aaa')
+            pixelMap.setPixel(lem.x+2 , lem.y+3 , [255,255,255,255]);
+            pixelMap.setPixel(lem.x+2 , lem.y+4 , [255,255,255,255]);
+            pixelMap.setPixel(lem.x+2 , lem.y+5 , [255,255,255,255]);
+            pixelMap.setPixel(lem.x+2 , lem.y+6 , [255,255,255,255]);
+            pixelMap.setPixel(lem.x+2 , lem.y+7 , [255,255,255,255]);
+        }
+
+    },
     fall(lem, pixelMap){
         lem.y++;
         if( !pixelMap.isPixelTransparent(groundX(lem), groundY(lem)) ){ 
@@ -75,6 +86,7 @@ let myStates = {
             pixelMap.clearPixel(lem.x +3, groundY(lem)+1 );
             pixelMap.clearPixel(lem.x +4, groundY(lem)+1 );
             pixelMap.clearPixel(lem.x +5, groundY(lem)+1 );
+            pixelMap.clearPixel(lem.x +6, groundY(lem)+1 );
             lem.y++;
         }
              

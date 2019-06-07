@@ -29,6 +29,7 @@ let selectedActor;
     // generate walking animation with the walking sprites from spritesheet
     
     let cursorSelected =  await new Sprite( spriteSheet,  133,  0, 14, 14 );
+    let cursorRegular  =  await new Sprite( spriteSheet,  148,  0, 14, 14 );
 
     let walkAnimation = new Animation({
         0  : await new Sprite( spriteSheet,  5,  1, 4, 9 ), 
@@ -41,16 +42,17 @@ let selectedActor;
         70 : await new Sprite( spriteSheet, 116, 1, 5, 9 ) 
     } , 80 , true ); 
 
-    let walkState = new State( 'walk', walkAnimation, myStates.walk );
-    let fallState = new State( 'fall', walkAnimation, myStates.fall );
-    let digState  = new State( 'dig',  walkAnimation, myStates.dig );
-    let tunnelState  = new State( 'tunnel',  walkAnimation, myStates.tunnel );
+    let walkState    = new State( 'walk', walkAnimation, myStates.walk );
+    let fallState    = new State( 'fall', walkAnimation, myStates.fall );
+    let digState     = new State( 'dig',  walkAnimation, myStates.dig );
+    let tunnelState  = new State( 'tunnel', walkAnimation, myStates.tunnel );
+    let blockState   = new State( 'block', walkAnimation, myStates.block );
 
     Actors = [];
     let interval = setInterval( ()=>{
         Actors.push(
             new Actor({
-                states : [walkState, fallState, digState, tunnelState],
+                states : [walkState, fallState, digState, tunnelState, blockState],
                 state  : 'walk',
                 x      : 470,
                 y      : 102,
@@ -68,11 +70,11 @@ let selectedActor;
     // viewport with config values to allow him to autoadapt 
     pixelMap = await new PixelMap('./maps/map2.png');
     
-    Jstick.Viewport.zoomTo(Jstick.Viewport.height/pixelMap.height,700,150);
+    Jstick.Camera.zoomAnimation(Jstick.Viewport.height/pixelMap.height,700,150);
     
 
-    Jstick.Viewport.scrollWidth  =  pixelMap.width;
-    Jstick.Viewport.scrollHeight =  pixelMap.height;
+    Jstick.Camera.scrollWidth  =  pixelMap.width;
+    Jstick.Camera.scrollHeight =  pixelMap.height;
 
     /** LOOP : UPDATE */
     Jstick.Loop.update = function( deltaTime , input ){
@@ -91,10 +93,10 @@ let selectedActor;
         if(input['mouse-wheel-up']) setZoom( input.MOUSEX, input.MOUSEY, 1 );
         if(input['mouse-wheel-down']) setZoom( input.MOUSEX, input.MOUSEY, -1 );
         
-        if(input['arrow-right']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX + 10, Jstick.Viewport.scrollY );
-        if(input['arrow-left']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX - 10, Jstick.Viewport.scrollY );
-        if(input['arrow-up']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX , Jstick.Viewport.scrollY - 10 );
-        if(input['arrow-down']) Jstick.Viewport.scrollAnimation( Jstick.Viewport.scrollX , Jstick.Viewport.scrollY + 10 );
+        if(input['arrow-right']) Jstick.Camera.scrollAnimation( Jstick.Camera.x + 10, Jstick.Camera.y );
+        if(input['arrow-left']) Jstick.Camera.scrollAnimation( Jstick.Camera.x - 10, Jstick.Camera.y );
+        if(input['arrow-up']) Jstick.Camera.scrollAnimation( Jstick.Camera.x , Jstick.Camera.y - 10 );
+        if(input['arrow-down']) Jstick.Camera.scrollAnimation( Jstick.Camera.x , Jstick.Camera.y + 10 );
         
         if(input['draw-but']) window.action='draw';
         if(input['erase-but']) window.action='erase';
@@ -127,9 +129,11 @@ let selectedActor;
             //console.log(cursorSelected,box, box.x, box.y, x, y)
             Jstick.Sprite.draw( cursorSelected , x, y  );
         }
-        Jstick.Viewport.drawCursor( input.MOUSEX, input.MOUSEY );
 
-
+        let mouseAbsCoords = Jstick.Viewport.getAbsoluteCoordinates(input.MOUSEX, input.MOUSEY);
+        let coordActors    = actorsAtCoords( input.MOUSEX, input.MOUSEY );
+        if( coordActors.length ) Jstick.Sprite.draw( cursorSelected , mouseAbsCoords[0]-7, mouseAbsCoords[1]-7  );
+        else Jstick.Sprite.draw( cursorRegular , mouseAbsCoords[0]-7, mouseAbsCoords[1]-7  );
 
         return;
     }
@@ -140,8 +144,8 @@ let selectedActor;
 
 
 function setZoom( x,y,direction ){
-    let newScale= Jstick.Viewport.scale + ( 1 * direction );
-    Jstick.Viewport.zoomTo(newScale, x , y);
+    let newScale= Jstick.Camera.zoom + ( 1 * direction );
+    Jstick.Camera.zoomAnimation(newScale, x , y);
 }
 
 function actorsAtCoords(x,y, single=false){
@@ -177,14 +181,17 @@ function onClick(x,y){
     }else if( window.action === 'tunnel'){
         let affected = actorsAtCoords(x,y, true);
         if( affected.length ) affected[ 0 ].setState('tunnel');
+    }else if( window.action === 'block'){
+        let affected = actorsAtCoords(x,y, true);
+        if( affected.length ) affected[ 0 ].setState('block');
     }
 }
 
 function applyAction(x,y){
     if( window.action === 'zoomIn' ){
-        Jstick.Viewport.zoomTo( Jstick.Viewport.scale + 1 , x , y  )
+        Jstick.Camera.zoomAnimation( Jstick.Camera.zoom + 1 , x , y  )
     }else if( window.action === 'zoomOut' ){
-        Jstick.Viewport.zoomTo( Jstick.Viewport.scale - 1 , x , y  )
+        Jstick.Camera.zoomAnimation( Jstick.Camera.zoom - 1 , x , y  )
     }else if( window.action === 'erase' ){
         [x , y] = Jstick.Viewport.getAbsoluteCoordinates( x, y );
 

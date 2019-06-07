@@ -29,8 +29,8 @@ Jstick.Loop = {
     },
 
     nextTick( timestamp=performance.now() ){
-        Jstick.Viewport.updateZoom();
-        Jstick.Viewport.updateScroll();
+        Jstick.Camera.updateZoom();
+        Jstick.Camera.updateScroll();
         Jstick.Camera.updateFollow();
         let input = Jstick.Input.getStatus();
         Jstick.Loop.update( timestamp, input );
