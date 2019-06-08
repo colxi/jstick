@@ -13,8 +13,38 @@ import {myStates}  from './js/actor-states.js';
 
 window.Jstick = Jstick;
 
-window.action = 'erase';
 
+
+/*
+let Scene = function( width, height ){
+    this.width = width;
+    this.height = height;
+    this.Layers = {};
+    return this;
+}
+
+Scene.prototype.addLayer = function( img , zindex, scrollModifier=1, zoomModifier=1){
+
+}
+
+(async function(){
+    //let myBackground = await Jstick.Image.load('./maps/map2.png');
+    //myScene.addLayer(image);
+
+    let myScene = new Scene(800,600);
+    let myCamera = new Camera( myScene );
+    Jstick.ViewPort.setView( myCamera );
+})()
+*/
+
+
+
+
+
+
+
+
+window.action = 'erase';
 let pixelMap;
 let Actors
 let selectedActor;
