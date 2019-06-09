@@ -29,15 +29,32 @@ Jstick.Loop = {
     },
 
     nextTick( timestamp=performance.now() ){
-        Jstick.Camera.updateZoom();
-        Jstick.Camera.updateScroll();
-        Jstick.Camera.updateFollow();
+        if(Jstick.Viewport.view){
+            Jstick.Viewport.view.updateZoom();
+            Jstick.Viewport.view.updateScroll();
+            Jstick.Viewport.view.updateFollow();
+        }
+        
         let input = Jstick.Input.getStatus();
         Jstick.Loop.update( timestamp, input );
         Jstick.Loop.draw( timestamp, input );
+        Jstick.Loop._renderCameraView();
         if( Jstick.showInfo ) Jstick.updateInfo();
         // reset some possible events like mousewheel
         Jstick.Input.__update__();
+    },
+
+    _renderCameraView(){
+        if( !Jstick.Viewport.view ) return;
+        let x1 = ( 0 - Jstick.Viewport.view.x );
+        let y1 = ( 0 - Jstick.Viewport.view.y );
+        let x2 = Jstick.Viewport.view.scene.width ;
+        let y2 = Jstick.Viewport.view.scene.height;
+        // Draw map data in canvas
+        Jstick.Viewport.clear()
+
+        let layer = Jstick.Viewport.view.scene.getLayers()['background'].getImageBitmap();
+        Jstick.Viewport.Layers.map.drawImage( layer, x1, y1, x2, y2 );   
     }
 
 }

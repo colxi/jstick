@@ -9,9 +9,9 @@ async function _loadImage_(src){
         // set onload handler : when image is loaded resolve promise
         img.onload = async function(e){
             let image   = await createImageBitmap( img, 0 ,0 , img.width, img.height );
-            img         = undefined;
-            img.onload  = undefined;
             img.onerror = undefined;
+            img.onload  = undefined;
+            img         = undefined;
             return resolve( image )
         }
         // set on error handler : if load fails throw an error
@@ -45,6 +45,8 @@ const Texture = /* async */ function( filepath = '' ){
         // updated too
         let IMAGE_DATA;
 
+        let IMAGE_BITMAP;
+
         // handle validation
         if( !(filepath instanceof ImageBitmap) ){
             if( typeof filepath !== 'string' ) throw new Error('Argument 1 must be a filepath or an ImageBitmap');
@@ -60,6 +62,8 @@ const Texture = /* async */ function( filepath = '' ){
         IMAGE_CANVAS.drawImage( tmp_image, 0, 0);
         // obtain the imageData buffer of the initial image
         IMAGE_DATA  = IMAGE_CANVAS.getImageData(0, 0, WIDTH , HEIGHT );
+
+        IMAGE_BITMAP = IMAGE_CANVAS.canvas.transferToImageBitmap();
 
         // clear unnecessary variables and references
         filepath = undefined;
@@ -103,11 +107,6 @@ const Texture = /* async */ function( filepath = '' ){
         this.crop = ( x, y, w, h )=>{ 
             // validate input
             if( isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h) ){ throw new Error('Arguments must be numbers')}
-            // Note : because this.getImageBitmap() disatachs the image from the canvas
-            // any method that relies on the presence of an image (like this one), must
-            // perform an apply() before proceeding, to force a dump from the imageData buffer
-            // into the canvas, to avoid errors
-            this.apply();
             // truncate numbers to garantee integers
             x <<= 0;
             y <<= 0;
@@ -119,8 +118,10 @@ const Texture = /* async */ function( filepath = '' ){
             WIDTH  = IMAGE_CANVAS.canvas.width  = w;
             HEIGHT = IMAGE_CANVAS.canvas.height = h;
             // update canvas content and imageData Object 
-            IMAGE_CANVAS.putImageData( cropped, 0,0 );
             IMAGE_DATA = cropped;
+            IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
+            IMAGE_BITMAP = IMAGE_CANVAS.canvas.transferToImageBitmap();
+            IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
             return true;
         };
 
@@ -132,11 +133,6 @@ const Texture = /* async */ function( filepath = '' ){
             if (typeof horizontal !== "boolean" || typeof vertical !== "boolean" ){
                 throw new Error('Only boolean values are accepted')
             }
-            // Note : because this.getImageBitmap() disatachs the image from the canvas
-            // any method that relies on the presence of an image (like this one), must
-            // perform an apply() before proceeding, to force a dump from the imageData buffer
-            // into the canvas, to avoid errors
-            this.apply();
             // apply flip transform
             IMAGE_CANVAS.setTransform(
                 (horizontal ? -1 : 1), 0,       // set the direction of x axis
@@ -149,6 +145,8 @@ const Texture = /* async */ function( filepath = '' ){
             IMAGE_CANVAS.resetTransform(); // polyfill : IMAGE_CANVAS.setTransform(1, 0, 0, 1, 0, 0);
             // update IMAGEDATA object 
             IMAGE_DATA = IMAGE_CANVAS.getImageData(0, 0, WIDTH , HEIGHT );
+            IMAGE_BITMAP = IMAGE_CANVAS.canvas.transferToImageBitmap();
+            IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
             return true;
         };
 
@@ -167,6 +165,8 @@ const Texture = /* async */ function( filepath = '' ){
                 IMAGE_DATA.data.set( data );
             }
             IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
+            IMAGE_BITMAP = IMAGE_CANVAS.canvas.transferToImageBitmap();
+            IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
             return true;
         };
         
@@ -175,12 +175,7 @@ const Texture = /* async */ function( filepath = '' ){
          *                                    perform fast canvas drawing.
          */
         this.getImageBitmap = function(){
-            // Note : this method disatachs the image from the canvas. 
-
-            // Efficient bitmap generation using transferToImageBitmap() 
-            // The ImageBitmap interface represents a bitmap image which can be drawn to 
-            // a <canvas> without undue latency 
-            return IMAGE_CANVAS.canvas.transferToImageBitmap();
+            return IMAGE_BITMAP;
         };
 
         /**
@@ -195,11 +190,6 @@ const Texture = /* async */ function( filepath = '' ){
          * Texture.prototype.toBlob : (async) Returns an Blob representatoion of the texture.
          */
         this.toBlob = async function(){
-            // Note : because this.getImageBitmap() disatachs the image from the canvas
-            // any method that relies on the presence of an image (like this one), must
-            // perform an apply() before proceeding, to force a dump from the imageData buffer
-            // into the canvas, to avoid errors
-            this.apply();
             return await IMAGE_CANVAS.canvas.convertToBlob() ;
         };
 
@@ -281,7 +271,7 @@ const Texture = /* async */ function( filepath = '' ){
         };
 
         /**
-         * Texture.prototype.clone : (async) Returns a clone of the current Texture
+         * Texture.prototype.clone : (async) Returns a clone of the Texture 
          */
         this.clone =  async function(){
             let clone = await new Texture( this.getImageBitmap() );
@@ -289,9 +279,10 @@ const Texture = /* async */ function( filepath = '' ){
         };
 
         /**
-         * Texture.prototype.clone : (async) Returns a clone of the current Texture
+         * Texture.prototype.cloneFromArea : (async) Returns a clone of a sector of 
+         *                                  the texture (resized)
          */
-         this.cloneArea =  async function( x, y, w, h ){
+         this.cloneFromArea =  async function( x, y, w, h ){
             let clone = await new Texture( this.getImageBitmap() );
             clone.crop( x, y, w, h );
             return clone;
@@ -302,3 +293,5 @@ const Texture = /* async */ function( filepath = '' ){
         return resolve( this );
     })
 }
+
+export {Texture};

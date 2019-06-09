@@ -3,7 +3,11 @@ import {Sprite}    from '../src/components/Sprite.js';
 import {Animation} from '../src/components/Animation.js';
 import {State}     from '../src/components/State.js';
 import {Actor}     from '../src/components/Actor.js';
-import {PixelMap}  from '../src/components/PixelMap.js';
+
+
+import {Texture}  from '../src/components/Texture.js';
+import {Scene}  from '../src/components/Scene.js';
+import {Camera}  from '../src/components/Camera.js';
 
 import './js/game-input.js';
 import {myStates}  from './js/actor-states.js';
@@ -15,27 +19,67 @@ window.Jstick = Jstick;
 
 
 
-/*
-let Scene = function( width, height ){
-    this.width = width;
-    this.height = height;
-    this.Layers = {};
-    return this;
-}
-
-Scene.prototype.addLayer = function( img , zindex, scrollModifier=1, zoomModifier=1){
-
-}
-
+let myCamera;
 (async function(){
-    //let myBackground = await Jstick.Image.load('./maps/map2.png');
-    //myScene.addLayer(image);
+    let myBackground = await new Texture('./maps/map2.png');
+    let myfarBackground = await new Texture('./maps/bakg.jpg');
+    
+    let myScene = new Scene( 1087, 319);
+    myScene.addLayer( 'background', myBackground , 0);
+    myScene.addLayer( 'far', myfarBackground , 0);
 
-    let myScene = new Scene(800,600);
-    let myCamera = new Camera( myScene );
-    Jstick.ViewPort.setView( myCamera );
+    myCamera = new Camera( myScene );
+    
+    Jstick.Viewport.setView( myCamera );
+
+    myCamera.zoomAnimation(Jstick.Viewport.height/myScene.height,700,150);
+
+    console.log(myBackground, myScene, myCamera);
+
+    Jstick.Loop.draw = function(){
+        
+    }
+
+    Jstick.Loop.update = function( deltaTime , input ){
+        document.getElementById('inputMouseCoords').innerHTML = input['MOUSEX'] + '-' + input['MOUSEY'];
+        document.getElementById('inputMouseLeft').innerHTML = input['mouse-left'];
+        document.getElementById('inputMouseRight').innerHTML = input['mouse-right'];
+        document.getElementById('inputMouseWheelUp').innerHTML = input['mouse-wheel-up'];
+        document.getElementById('inputMouseWheelDown').innerHTML = input['mouse-wheel-down'];
+        document.getElementById('inputKeybD').innerHTML = input['draw-but'];
+        document.getElementById('inputKeybE').innerHTML = input['erase-but'];
+        document.getElementById('inputKeybArrowUp').innerHTML = input['arrow-up'];
+        document.getElementById('inputKeybArrowDown').innerHTML = input['arrow-down'];
+        document.getElementById('inputKeybArrowLeft').innerHTML = input['arrow-left'];
+        document.getElementById('inputKeybArrowRight').innerHTML = input['arrow-right'];
+        
+        if(input['mouse-wheel-up']) setZoom( input.MOUSEX, input.MOUSEY, 1 );
+        if(input['mouse-wheel-down']) setZoom( input.MOUSEX, input.MOUSEY, -1 );
+        
+        if(input['arrow-right']) myCamera.scrollAnimation( myCamera.x + 10, myCamera.y );
+        if(input['arrow-left']) myCamera.scrollAnimation( myCamera.x - 10, myCamera.y );
+        if(input['arrow-up']) myCamera.scrollAnimation( myCamera.x , myCamera.y - 10 );
+        if(input['arrow-down']) myCamera.scrollAnimation( myCamera.x , myCamera.y + 10 );
+        
+        if(input['draw-but']) window.action='draw';
+        if(input['erase-but']) window.action='erase';
+        
+        if(input['mouse-left']) applyAction( input.MOUSEX, input.MOUSEY );
+
+        if(input['mouse-click']) onClick( input.MOUSEX, input.MOUSEY );
+
+    }
+
+
+   // Jstick.ViewPort.setView( myCamera );
 })()
-*/
+
+
+function setZoom( x,y,direction ){
+    let newScale= myCamera.zoom + ( 1 * direction );
+    myCamera.zoomAnimation(newScale, x , y);
+    console.log('setting zoom', newScale, x, y)
+}
 
 
 
@@ -51,6 +95,7 @@ let selectedActor;
 
 
 (async function(){
+return
     Jstick.Viewport.hideDeviceCursor = true;
     //Jstick.Sprite.drawBoundingBoxes  = true;
 
@@ -172,7 +217,7 @@ let selectedActor;
 
 })();
 
-
+/*
 function setZoom( x,y,direction ){
     let newScale= Jstick.Camera.zoom + ( 1 * direction );
     Jstick.Camera.zoomAnimation(newScale, x , y);
@@ -255,4 +300,4 @@ function applyAction(x,y){
 }
 
 
-
+*/
