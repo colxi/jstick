@@ -6,6 +6,11 @@ let IMAGE_SMOOTHING = false;
 
 Jstick.RenderEngine = {
     activeScene : null,
+
+    sceneCanvas : {},
+    
+    draw(){},
+
     
     setScene( scene ){
         Jstick.Viewport.container.innerHTML = '';
