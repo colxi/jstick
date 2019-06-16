@@ -29,10 +29,10 @@ Jstick.Loop = {
     },
 
     nextTick( timestamp=performance.now() ){
-        if(Jstick.Viewport.view){
-            Jstick.Viewport.view.updateZoom();
-            Jstick.Viewport.view.updateScroll();
-            Jstick.Viewport.view.updateFollow();
+        if(Jstick.RenderEngine.activeScene){
+            Jstick.RenderEngine.activeScene.Camera.updateZoom();
+            Jstick.RenderEngine.activeScene.Camera.updateScroll();
+            Jstick.RenderEngine.activeScene.Camera.updateFollow();
         }
         
         let input = Jstick.Input.getStatus();
@@ -45,16 +45,18 @@ Jstick.Loop = {
     },
 
     _renderCameraView(){
-        if( !Jstick.Viewport.view ) return;
-        let x1 = ( 0 - Jstick.Viewport.view.x );
-        let y1 = ( 0 - Jstick.Viewport.view.y );
-        let x2 = Jstick.Viewport.view.scene.width ;
-        let y2 = Jstick.Viewport.view.scene.height;
+        if( !Jstick.RenderEngine.activeScene ) return;
+        let x1 = ( 0 - Jstick.RenderEngine.activeScene.Camera.x );
+        let y1 = ( 0 - Jstick.RenderEngine.activeScene.Camera.y );
+        let x2 = Jstick.RenderEngine.activeScene.width ;
+        let y2 = Jstick.RenderEngine.activeScene.height;
         // Draw map data in canvas
-        Jstick.Viewport.clear()
-
-        let layer = Jstick.Viewport.view.scene.getLayers()['background'].getImageBitmap();
-        Jstick.Viewport.Layers.map.drawImage( layer, x1, y1, x2, y2 );   
+        Jstick.RenderEngine.clear()
+        for(let layer in Jstick.RenderEngine.activeScene.Layers ){
+            if( !Jstick.RenderEngine.activeScene.Layers[layer].texture ) continue;
+            let img = Jstick.RenderEngine.activeScene.Layers[layer].texture.getImageBitmap();
+            Jstick.Viewport.Layers[layer].drawImage( img, x1, y1, x2, y2 );   
+        }
     }
 
 }

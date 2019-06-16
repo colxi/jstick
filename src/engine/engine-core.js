@@ -12,9 +12,9 @@ const Jstick  = {
         // info panel
 
         document.getElementById('FPS').innerHTML = Jstick.Loop.fps;
-        if(Jstick.Viewport.view){
-            document.getElementById("scaleInfo").innerHTML = Jstick.Viewport.view.zoom.toFixed(2);
-            document.getElementById("scrollInfo").innerHTML = ( Jstick.Viewport.view.x << 0 ) +' | '+ ( Jstick.Viewport.view.y << 0 );
+        if(Jstick.RenderEngine.activeScene){
+            document.getElementById("scaleInfo").innerHTML = Jstick.RenderEngine.activeScene.Camera.zoom.toFixed(2);
+            document.getElementById("scrollInfo").innerHTML = ( Jstick.RenderEngine.activeScene.Camera.x << 0 ) +' | '+ ( Jstick.RenderEngine.activeScene.Camera.y << 0 );
         }
     },
 

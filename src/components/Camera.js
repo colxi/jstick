@@ -7,6 +7,7 @@ const Camera = function( scene ){
     // otherwhise the Constructor will fail for the lack of own context (this)
     if( !this ) return new Camera( scene );
 
+    const SCENE = scene;
 
     let TARGET_ZOOM = false ; /* {
         x : 0,
@@ -26,7 +27,6 @@ const Camera = function( scene ){
     let FOLLOWING = undefined;
     let SCALE = 1;
 
-    this.scene = scene;
 
     this.follow =  ( actor )=>{
         FOLLOWING = actor;
@@ -61,8 +61,8 @@ const Camera = function( scene ){
             // prevent negative is scroll if disabled
             if( !this.allowNegativeScrolling && val<0 ) val = 0;
             // limit maxscroll if scroll width has been set
-            if( this.scene.width !== false ){
-                let maxScroll = Math.max( 0, ( (this.scene.width * SCALE) - Jstick.Viewport.width ) / SCALE );
+            if( SCENE.width !== false ){
+                let maxScroll = Math.max( 0, ( (SCENE.width * SCALE) - Jstick.Viewport.width ) / SCALE );
                 if( val > maxScroll ) val = maxScroll;
             }
             SCROLL_X = val;
@@ -80,8 +80,8 @@ const Camera = function( scene ){
             // prevent negative is scroll if disabled
             if( !this.allowNegativeScrolling && val<0 ) val = 0;
             // limit maxscroll if scroll height has been set
-            if( this.scene.height !== false){
-                let maxScroll = Math.max( 0, ( (this.scene.height * SCALE) - Jstick.Viewport.height ) / SCALE );
+            if( SCENE.height !== false){
+                let maxScroll = Math.max( 0, ( (SCENE.height * SCALE) - Jstick.Viewport.height ) / SCALE );
                 if( val > maxScroll ) val = maxScroll;
             }
             SCROLL_Y = val ;
@@ -119,7 +119,7 @@ const Camera = function( scene ){
         set : (val)=>{
             let previousScale = SCALE;
             // autofit test
-            if( this.scene.height * val < Jstick.Viewport.height && val < SCALE ){ 
+            if( SCENE.height * val < Jstick.Viewport.height && val < SCALE ){ 
                 TARGET_ZOOM = false;
                 return false;
             }
@@ -135,11 +135,10 @@ const Camera = function( scene ){
             this.y += ( zoomY / previousScale ) - ( zoomY / SCALE );
         
             // apply new scale  to MAP and SPRITES layers in a non acumulative way
-            Jstick.Viewport.Layers.map.setTransform(1, 0, 0, 1, 0, 0);
-            Jstick.Viewport.Layers.sprites.setTransform(1, 0, 0, 1, 0, 0);
-            Jstick.Viewport.Layers.map.scale(SCALE, SCALE);
-            Jstick.Viewport.Layers.sprites.scale(SCALE, SCALE);
-
+            for(let layer in Jstick.Viewport.Layers){
+                Jstick.Viewport.Layers[layer].setTransform(1, 0, 0, 1, 0, 0);
+                Jstick.Viewport.Layers[layer].scale(SCALE, SCALE);
+            }
             return SCALE 
         },
         configurable: false

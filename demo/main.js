@@ -7,37 +7,39 @@ import {Actor}     from '../src/components/Actor.js';
 
 import {Texture}  from '../src/components/Texture.js';
 import {Scene}  from '../src/components/Scene.js';
-import {Camera}  from '../src/components/Camera.js';
 
 import './js/game-input.js';
 import {myStates}  from './js/actor-states.js';
 
 
-
-
 window.Jstick = Jstick;
 
 
+let myScene;
 
-let myCamera;
+
 (async function(){
-    let myBackground = await new Texture('./maps/map2.png');
-    let myfarBackground = await new Texture('./maps/bakg.jpg');
+    let myBackground    = await new Texture('./maps/map2.png');
+    let myfarBackground = await new Texture('./maps/back.jpg');
     
-    let myScene = new Scene( 1087, 319);
-    myScene.addLayer( 'background', myBackground , 0);
-    myScene.addLayer( 'far', myfarBackground , 0);
-
-    myCamera = new Camera( myScene );
+    myScene = new Scene( 1087, 319);
+    myScene.addLayer( 'terrain', myBackground , 0);
+    myScene.addLayer( 'landscape', myfarBackground , -1);
+    myScene.addLayer( 'sprites', null , 1);
     
-    Jstick.Viewport.setView( myCamera );
+    Jstick.RenderEngine.setScene( myScene );
 
-    myCamera.zoomAnimation(Jstick.Viewport.height/myScene.height,700,150);
+    myScene.Camera.zoomAnimation(Jstick.Viewport.height/myScene.height,700,150);
 
-    console.log(myBackground, myScene, myCamera);
+   // console.log(myBackground, myScene, myScene.Camera);
 
     Jstick.Loop.draw = function(){
-        
+        /*
+        Jstick.RenderEngine.clear(); // clears all te layers of the scene    
+        Jstick.RenderEngine.draw(); // draws all the layers of the scene
+        Jstick.RenderEngine.draw( mysprite , x, y, myScene.Layers.sprites );
+        Jstick.RenderEngine.draw( myActor , x, y, myScene.Layers.sprites );
+        */
     }
 
     Jstick.Loop.update = function( deltaTime , input ){
@@ -56,10 +58,10 @@ let myCamera;
         if(input['mouse-wheel-up']) setZoom( input.MOUSEX, input.MOUSEY, 1 );
         if(input['mouse-wheel-down']) setZoom( input.MOUSEX, input.MOUSEY, -1 );
         
-        if(input['arrow-right']) myCamera.scrollAnimation( myCamera.x + 10, myCamera.y );
-        if(input['arrow-left']) myCamera.scrollAnimation( myCamera.x - 10, myCamera.y );
-        if(input['arrow-up']) myCamera.scrollAnimation( myCamera.x , myCamera.y - 10 );
-        if(input['arrow-down']) myCamera.scrollAnimation( myCamera.x , myCamera.y + 10 );
+        if(input['arrow-right']) myScene.Camera.scrollAnimation( myScene.Camera.x + 10, myScene.Camera.y );
+        if(input['arrow-left']) myScene.Camera.scrollAnimation( myScene.Camera.x - 10, myScene.Camera.y );
+        if(input['arrow-up']) myScene.Camera.scrollAnimation( myScene.Camera.x , myScene.Camera.y - 10 );
+        if(input['arrow-down']) myScene.Camera.scrollAnimation( myScene.Camera.x , myScene.Camera.y + 10 );
         
         if(input['draw-but']) window.action='draw';
         if(input['erase-but']) window.action='erase';
@@ -71,13 +73,13 @@ let myCamera;
     }
 
 
-   // Jstick.ViewPort.setView( myCamera );
+   // Jstick.ViewPort.setView( myScene.Camera );
 })()
 
 
 function setZoom( x,y,direction ){
-    let newScale= myCamera.zoom + ( 1 * direction );
-    myCamera.zoomAnimation(newScale, x , y);
+    let newScale= myScene.Camera.zoom + ( 1 * direction );
+    myScene.Camera.zoomAnimation(newScale, x , y);
     console.log('setting zoom', newScale, x, y)
 }
 
