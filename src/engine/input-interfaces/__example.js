@@ -21,9 +21,9 @@ export default {
     //                        inputs and activity. 
     enable(){
         // declare the event listeners related to the interface
-        Jstick.Viewport.Layers.container.addEventListener ( 'mousedown', mouseDown, false);
-        Jstick.Viewport.Layers.container.addEventListener ( 'mouseup', mouseUp, false );
-        Jstick.Viewport.Layers.container.addEventListener ( 'mousemove', mouseMove, false );
+        Jstick.Viewport.container.addEventListener ( 'mousedown', mouseDown, false);
+        Jstick.Viewport.container.addEventListener ( 'mouseup', mouseUp, false );
+        Jstick.Viewport.container.addEventListener ( 'mousemove', mouseMove, false );
         // if required register some interface attributes (interface states)
         Jstick.Input.__registerInterfaceAttribute__( 'MOUSEX' , 0);
         Jstick.Input.__registerInterfaceAttribute__( 'MOUSEY' , 0);
@@ -34,9 +34,9 @@ export default {
     //                         undoes the actions of <Interface>.enable()
     disable(){
         // remove event listeners
-        Jstick.Viewport.Layers.container.removeEventListener ( 'mousedown', mouseDown ,false);
-        Jstick.Viewport.Layers.container.removeEventListener ( 'mouseup', mouseUp ,false);
-        Jstick.Viewport.Layers.container.removeEventListener ( 'mousemove', mouseMove, false );
+        Jstick.Viewport.container.removeEventListener ( 'mousedown', mouseDown ,false);
+        Jstick.Viewport.container.removeEventListener ( 'mouseup', mouseUp ,false);
+        Jstick.Viewport.container.removeEventListener ( 'mousemove', mouseMove, false );
         // unregister interface attributes
         Jstick.Input.__unregisterInterfaceAttribute__( 'MOUSEX' , 0);
         Jstick.Input.__unregisterInterfaceAttribute__( 'MOUSEY' , 0);

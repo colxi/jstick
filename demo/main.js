@@ -3,24 +3,101 @@ import {Sprite}    from '../src/components/Sprite.js';
 import {Animation} from '../src/components/Animation.js';
 import {State}     from '../src/components/State.js';
 import {Actor}     from '../src/components/Actor.js';
-import {PixelMap}  from '../src/components/PixelMap.js';
+
+
+import {Texture}  from '../src/components/Texture.js';
+import {Scene}  from '../src/components/Scene.js';
 
 import './js/game-input.js';
 import {myStates}  from './js/actor-states.js';
 
 
-
-
 window.Jstick = Jstick;
 
-window.action = 'erase';
 
+let myScene;
+
+
+(async function(){
+    let myBackground    = await new Texture('./maps/map2.png');
+    let myfarBackground = await new Texture('./maps/back.jpg');
+    
+    myScene = new Scene( 1087, 319);
+    myScene.addLayer( 'terrain', myBackground , 0);
+    myScene.addLayer( 'landscape', myfarBackground , -1);
+    myScene.addLayer( 'sprites', null , 1);
+    
+    Jstick.RenderEngine.setScene( myScene );
+
+    myScene.Camera.zoomAnimation(Jstick.Viewport.height/myScene.height,700,150);
+
+   // console.log(myBackground, myScene, myScene.Camera);
+
+    Jstick.Loop.draw = function(){
+        /*
+        Jstick.RenderEngine.clear(); // clears all te layers of the scene    
+        Jstick.RenderEngine.draw(); // draws all the layers of the scene
+        Jstick.RenderEngine.draw( mysprite , x, y, myScene.Layers.sprites );
+        Jstick.RenderEngine.draw( myActor , x, y, myScene.Layers.sprites );
+        */
+    }
+
+    Jstick.Loop.update = function( deltaTime , input ){
+        document.getElementById('inputMouseCoords').innerHTML = input['MOUSEX'] + '-' + input['MOUSEY'];
+        document.getElementById('inputMouseLeft').innerHTML = input['mouse-left'];
+        document.getElementById('inputMouseRight').innerHTML = input['mouse-right'];
+        document.getElementById('inputMouseWheelUp').innerHTML = input['mouse-wheel-up'];
+        document.getElementById('inputMouseWheelDown').innerHTML = input['mouse-wheel-down'];
+        document.getElementById('inputKeybD').innerHTML = input['draw-but'];
+        document.getElementById('inputKeybE').innerHTML = input['erase-but'];
+        document.getElementById('inputKeybArrowUp').innerHTML = input['arrow-up'];
+        document.getElementById('inputKeybArrowDown').innerHTML = input['arrow-down'];
+        document.getElementById('inputKeybArrowLeft').innerHTML = input['arrow-left'];
+        document.getElementById('inputKeybArrowRight').innerHTML = input['arrow-right'];
+        
+        if(input['mouse-wheel-up']) setZoom( input.MOUSEX, input.MOUSEY, 1 );
+        if(input['mouse-wheel-down']) setZoom( input.MOUSEX, input.MOUSEY, -1 );
+        
+        if(input['arrow-right']) myScene.Camera.scrollAnimation( myScene.Camera.x + 10, myScene.Camera.y );
+        if(input['arrow-left']) myScene.Camera.scrollAnimation( myScene.Camera.x - 10, myScene.Camera.y );
+        if(input['arrow-up']) myScene.Camera.scrollAnimation( myScene.Camera.x , myScene.Camera.y - 10 );
+        if(input['arrow-down']) myScene.Camera.scrollAnimation( myScene.Camera.x , myScene.Camera.y + 10 );
+        
+        if(input['draw-but']) window.action='draw';
+        if(input['erase-but']) window.action='erase';
+        
+        if(input['mouse-left']) applyAction( input.MOUSEX, input.MOUSEY );
+
+        if(input['mouse-click']) onClick( input.MOUSEX, input.MOUSEY );
+
+    }
+
+
+   // Jstick.ViewPort.setView( myScene.Camera );
+})()
+
+
+function setZoom( x,y,direction ){
+    let newScale= myScene.Camera.zoom + ( 1 * direction );
+    myScene.Camera.zoomAnimation(newScale, x , y);
+    console.log('setting zoom', newScale, x, y)
+}
+
+
+
+
+
+
+
+
+window.action = 'erase';
 let pixelMap;
 let Actors
 let selectedActor;
 
 
 (async function(){
+return
     Jstick.Viewport.hideDeviceCursor = true;
     //Jstick.Sprite.drawBoundingBoxes  = true;
 
@@ -142,7 +219,7 @@ let selectedActor;
 
 })();
 
-
+/*
 function setZoom( x,y,direction ){
     let newScale= Jstick.Camera.zoom + ( 1 * direction );
     Jstick.Camera.zoomAnimation(newScale, x , y);
@@ -225,4 +302,4 @@ function applyAction(x,y){
 }
 
 
-
+*/

@@ -4,24 +4,24 @@ export default {
     name    : 'mouse',
     signals : [ 'MOUSECLICK' , 'MOUSELEFT', 'MOUSERIGHT', 'MOUSEWHEELUP', 'MOUSEWHEELDOWN' ],
     enable(){
-        Jstick.Viewport.Layers.container.addEventListener ( 'click', mouseClick, false);
-        Jstick.Viewport.Layers.container.addEventListener ( 'mousedown', mouseDown, false);
-        Jstick.Viewport.Layers.container.addEventListener ( 'mouseup', mouseUp, false );
-        Jstick.Viewport.Layers.container.addEventListener ( 'mousewheel', mouseWheel, false );
-        Jstick.Viewport.Layers.container.addEventListener ( 'mousemove', mouseMove, false );
-        Jstick.Viewport.Layers.container.addEventListener ( 'contextmenu', contextMenu, false );
+        Jstick.Viewport.container.addEventListener ( 'click', mouseClick, false);
+        Jstick.Viewport.container.addEventListener ( 'mousedown', mouseDown, false);
+        Jstick.Viewport.container.addEventListener ( 'mouseup', mouseUp, false );
+        Jstick.Viewport.container.addEventListener ( 'mousewheel', mouseWheel, false );
+        Jstick.Viewport.container.addEventListener ( 'mousemove', mouseMove, false );
+        Jstick.Viewport.container.addEventListener ( 'contextmenu', contextMenu, false );
 
         Jstick.Input.__registerInterfaceAttribute__( 'MOUSEX' , 0);
         Jstick.Input.__registerInterfaceAttribute__( 'MOUSEY' , 0);
         return true;
     },
     disable(){
-        Jstick.Viewport.Layers.container.removeEventListener ( 'click', mouseClick ,false);
-        Jstick.Viewport.Layers.container.removeEventListener ( 'mousedown', mouseDown ,false);
-        Jstick.Viewport.Layers.container.removeEventListener ( 'mouseup', mouseUp ,false);
-        Jstick.Viewport.Layers.container.removeEventListener ( 'mousewheel', mouseWheel ,false);
-        Jstick.Viewport.Layers.container.removeEventListener ( 'mousemove', mouseMove, false );
-        Jstick.Viewport.Layers.container.removeEventListener ( 'contextmenu', contextMenu ,false);
+        Jstick.Viewport.container.removeEventListener ( 'click', mouseClick ,false);
+        Jstick.Viewport.container.removeEventListener ( 'mousedown', mouseDown ,false);
+        Jstick.Viewport.container.removeEventListener ( 'mouseup', mouseUp ,false);
+        Jstick.Viewport.container.removeEventListener ( 'mousewheel', mouseWheel ,false);
+        Jstick.Viewport.container.removeEventListener ( 'mousemove', mouseMove, false );
+        Jstick.Viewport.container.removeEventListener ( 'contextmenu', contextMenu ,false);
 
         Jstick.Input.__unregisterInterfaceAttribute__( 'MOUSEX' , 0);
         Jstick.Input.__unregisterInterfaceAttribute__( 'MOUSEY' , 0);
