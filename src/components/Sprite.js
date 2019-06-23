@@ -1,4 +1,6 @@
 import {Jstick} from '../jstick.js';
+import {Texture}  from './Texture.js';
+
 
 /**
  * 
@@ -17,24 +19,24 @@ const Sprite = /* async */ function( image = '', x=0, y=0, w, h ){
     
     return new Promise( async resolve =>{
         // input validation
-        if( !(image instanceof ImageBitmap) && (typeof image !== 'string') ){
-            throw new Error('Argument 1 must be a filepath or an ImageBitmap');
+        if( !(image instanceof Texture) ){
+            throw new Error('Argument 1 must be  a Texture or a filepath');
         };
 
         // if source is a path, load the image
-        if( typeof image === 'string' ) image = await Jstick.Image.load( image );
+        if( typeof image === 'string' ) image = await new Texture( image );
         // if cropping values are not set, use the whole image size
         w = w || image.width;
         h = h || image.height;
         // crop the image
-        let spriteImage = await Jstick.Image.crop( image, x, y, w, h);
+        let spriteImage = await image.cloneFromArea ( x, y, w, h );
         
         // cache the resultimg image (cache will cache the flipped versions too)
-        await Jstick.Cache.sprite( spriteImage ); 
+        // await Jstick.Cache.sprite( spriteImage ); 
 
         // build the Sprite object
         this.__type__ = 'Sprite';
-        this.image = spriteImage;
+        this.texture = spriteImage;
         this.flip = {
             x : false,
             y : false

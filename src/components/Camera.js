@@ -135,9 +135,12 @@ const Camera = function( scene ){
             this.y += ( zoomY / previousScale ) - ( zoomY / SCALE );
         
             // apply new scale  to MAP and SPRITES layers in a non acumulative way
-            for(let layer in Jstick.Viewport.Layers){
-                Jstick.Viewport.Layers[layer].setTransform(1, 0, 0, 1, 0, 0);
-                Jstick.Viewport.Layers[layer].scale(SCALE, SCALE);
+            for(let layer in Jstick.RenderEngine.canvasContexts){
+                let layerZoomFactor = Jstick.RenderEngine.activeScene.Layers[layer].zoomFactor;
+                // dont apply new zoom to layer, if layer is non reactive to zoom
+                if( layerZoomFactor === 0 ) continue;
+                Jstick.RenderEngine.canvasContexts[layer].setTransform(1, 0, 0, 1, 0, 0);
+                Jstick.RenderEngine.canvasContexts[layer].scale(SCALE / layerZoomFactor, SCALE / layerZoomFactor);
             }
             return SCALE 
         },

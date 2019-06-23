@@ -31,7 +31,7 @@ const Actor =  function( config  ){
 }
 
 Actor.prototype.getBoundingBox = function(){
-    let currentSpriteImage = this.getCurrentSprite().image;
+    let currentSpriteImage = this.getCurrentSprite().texture;
     return {
         x : this.x, 
         y : this.y, 

@@ -38,26 +38,12 @@ Jstick.Loop = {
         let input = Jstick.Input.getStatus();
         Jstick.Loop.update( timestamp, input );
         Jstick.Loop.draw( timestamp, input );
-        Jstick.Loop._renderCameraView();
         if( Jstick.showInfo ) Jstick.updateInfo();
         // reset some possible events like mousewheel
         Jstick.Input.__update__();
     },
 
-    _renderCameraView(){
-        if( !Jstick.RenderEngine.activeScene ) return;
-        let x1 = ( 0 - Jstick.RenderEngine.activeScene.Camera.x );
-        let y1 = ( 0 - Jstick.RenderEngine.activeScene.Camera.y );
-        let x2 = Jstick.RenderEngine.activeScene.width ;
-        let y2 = Jstick.RenderEngine.activeScene.height;
-        // Draw map data in canvas
-        Jstick.RenderEngine.clear()
-        for(let layer in Jstick.RenderEngine.activeScene.Layers ){
-            if( !Jstick.RenderEngine.activeScene.Layers[layer].texture ) continue;
-            let img = Jstick.RenderEngine.activeScene.Layers[layer].texture.getImageBitmap();
-            Jstick.Viewport.Layers[layer].drawImage( img, x1, y1, x2, y2 );   
-        }
-    }
+    
 
 }
 
