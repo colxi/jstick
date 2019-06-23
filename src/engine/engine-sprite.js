@@ -37,7 +37,7 @@ Jstick.Sprite = {
 
         // draw the imageBitmap in the requested coordinates, considering
         // Viewport scroll 
-        Jstick.Viewport.Layers.sprites.drawImage( 
+        Jstick.RenderEngine.canvasContexts.sprites.drawImage( 
             image , 
             ( x - Jstick.Camera.x ), 
             ( y - Jstick.Camera.y ), 
@@ -50,17 +50,17 @@ Jstick.Sprite = {
             y : y + image.height - 1 - Jstick.Camera.y,
         }
         if( BOUNDING_BOXES ){
-            //Jstick.Viewport.Layers.sprites.strokeStyle = "#FF0000";
-            //Jstick.Viewport.Layers.sprites.strokeRect(x- Jstick.Camera.x, y- Jstick.Camera.y,image.width,image.height);
+            //Jstick.RenderEngine.canvasContexts.sprites.strokeStyle = "#FF0000";
+            //Jstick.RenderEngine.canvasContexts.sprites.strokeRect(x- Jstick.Camera.x, y- Jstick.Camera.y,image.width,image.height);
         }
         
         // draw axis
-        //Jstick.Viewport.Layers.sprites.fillStyle = "#00FFFF";
-        //Jstick.Viewport.Layers.sprites.fillRect(lemCenter.x, lemCenter.y,1,5);
+        //Jstick.RenderEngine.canvasContexts.sprites.fillStyle = "#00FFFF";
+        //Jstick.RenderEngine.canvasContexts.sprites.fillRect(lemCenter.x, lemCenter.y,1,5);
 
         // draw ground coord
-        //Jstick.Viewport.Layers.sprites.fillStyle = "#FF0000";
-        //Jstick.Viewport.Layers.sprites.fillRect(lemCenter.x, lemCenter.y,1,1);
+        //Jstick.RenderEngine.canvasContexts.sprites.fillStyle = "#FF0000";
+        //Jstick.RenderEngine.canvasContexts.sprites.fillRect(lemCenter.x, lemCenter.y,1,1);
     },
 
     set drawBoundingBoxes( val ){
