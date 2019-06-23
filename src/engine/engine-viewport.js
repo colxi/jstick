@@ -36,19 +36,6 @@ Jstick.Viewport = {
         return true;
     },
 
-
-    Layers : {
-        // map farest (non interactive & farest layer of map. Usually scenario opaque image. Allows paralax)
-        // map behind (non interactive layer of map behind the main map. Allows paralax)
-        //map     : document.getElementById('map').getContext('2d'),
-        //sprites : document.getElementById('sprites').getContext('2d'),
-        // particles (layer for particles and atmosphere)
-        // map front (layer of map in front of sprites, allows paralaxing)
-        // window UI (game information, lifes, time etc...)
-    },
-
-    
-
   
 
     /*********************************************************************/
@@ -72,8 +59,10 @@ Jstick.Viewport = {
     
     getAbsoluteCoordinates( x , y ){
         return [
-            Math.floor( ( x / Jstick.view.zoom ) + SCROLL_X ) ,
-            Math.floor( ( y / Jstick.view.zoom ) + SCROLL_Y )
+            //Math.floor( ( x / Jstick.RenderEngine.activeScene.Camera.zoom ) ) ,
+            //Math.floor( ( y / Jstick.RenderEngine.activeScene.Camera.zoom )  )
+            Math.floor( ( x / Jstick.RenderEngine.activeScene.Camera.zoom ) + Jstick.RenderEngine.activeScene.Camera.x ) ,
+            Math.floor( ( y / Jstick.RenderEngine.activeScene.Camera.zoom ) + Jstick.RenderEngine.activeScene.Camera.y )
         ];
     },
     

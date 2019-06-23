@@ -9,8 +9,6 @@ async function _loadImage_(src){
         // set onload handler : when image is loaded resolve promise
         img.onload = async function(e){
             let image   = await createImageBitmap( img, 0 ,0 , img.width, img.height );
-            img.onerror = undefined;
-            img.onload  = undefined;
             img         = undefined;
             return resolve( image )
         }
@@ -47,27 +45,11 @@ const Texture = /* async */ function( filepath = '' ){
 
         let IMAGE_BITMAP;
 
-        // handle validation
+        // validate input
         if( !(filepath instanceof ImageBitmap) ){
             if( typeof filepath !== 'string' ) throw new Error('Argument 1 must be a filepath or an ImageBitmap');
             tmp_image = await _loadImage_( filepath );
         }else tmp_image = filepath;
-
-        // Store image width and height
-        WIDTH  = tmp_image.width;
-        HEIGHT = tmp_image.height;
-        
-        // Obtained image will be stored in a canvas to allow its manipulation 
-        IMAGE_CANVAS =  new OffscreenCanvas(WIDTH,HEIGHT).getContext('2d');
-        IMAGE_CANVAS.drawImage( tmp_image, 0, 0);
-        // obtain the imageData buffer of the initial image
-        IMAGE_DATA  = IMAGE_CANVAS.getImageData(0, 0, WIDTH , HEIGHT );
-
-        IMAGE_BITMAP = IMAGE_CANVAS.canvas.transferToImageBitmap();
-
-        // clear unnecessary variables and references
-        filepath = undefined;
-        tmp_image = undefined;
 
 
         /**********************************************************************
@@ -113,15 +95,12 @@ const Texture = /* async */ function( filepath = '' ){
             w <<= 0;
             h <<= 0;
             // extract the cropped image data
-            let cropped = IMAGE_CANVAS.getImageData(x, y, w , h);
+            IMAGE_DATA = IMAGE_CANVAS.getImageData(x, y, w , h);
             // assign new sizes
             WIDTH  = IMAGE_CANVAS.canvas.width  = w;
             HEIGHT = IMAGE_CANVAS.canvas.height = h;
-            // update canvas content and imageData Object 
-            IMAGE_DATA = cropped;
-            IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
-            IMAGE_BITMAP = IMAGE_CANVAS.canvas.transferToImageBitmap();
-            IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
+            // update canvas content 
+            this.apply();
             return true;
         };
 
@@ -145,8 +124,7 @@ const Texture = /* async */ function( filepath = '' ){
             IMAGE_CANVAS.resetTransform(); // polyfill : IMAGE_CANVAS.setTransform(1, 0, 0, 1, 0, 0);
             // update IMAGEDATA object 
             IMAGE_DATA = IMAGE_CANVAS.getImageData(0, 0, WIDTH , HEIGHT );
-            IMAGE_BITMAP = IMAGE_CANVAS.canvas.transferToImageBitmap();
-            IMAGE_CANVAS.putImageData( IMAGE_DATA, 0,0 );
+            this.apply();
             return true;
         };
 
@@ -290,6 +268,27 @@ const Texture = /* async */ function( filepath = '' ){
 
 
 
+        /*********************************************************************************
+         * 
+         * 
+         *********************************************************************************/
+
+        // Store image width and height
+        WIDTH  = tmp_image.width;
+        HEIGHT = tmp_image.height;
+        
+        // Obtained image will be stored in a canvas to allow its manipulation 
+        IMAGE_CANVAS =  new OffscreenCanvas(WIDTH,HEIGHT).getContext('2d');
+        IMAGE_CANVAS.drawImage( tmp_image, 0, 0);
+        // obtain the imageData buffer of the initial image
+        IMAGE_DATA  = IMAGE_CANVAS.getImageData(0, 0, WIDTH , HEIGHT );
+
+        this.apply();
+
+        // clear unnecessary variables and references
+        filepath = undefined;
+        tmp_image = undefined;
+        
         return resolve( this );
     })
 }
