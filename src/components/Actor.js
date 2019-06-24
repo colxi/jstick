@@ -1,4 +1,3 @@
-import {Jstick} from '../jstick.js';
 
 
 let ACTOR_ID = 0;

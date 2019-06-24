@@ -1,4 +1,3 @@
-import {Jstick} from '../jstick.js';
 import {Texture}  from './Texture.js';
 
 
