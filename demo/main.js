@@ -4,8 +4,8 @@ import {Actor}   from '../src/components/Actor.js';
 import {Texture} from '../src/components/Texture.js';
 import {Scene}   from '../src/components/Scene.js';
 
-import './js/game-input.js';
-import {generateStates}  from './js/actor-states.js';
+import {configureInput} from './js/game-input.js';
+import {generateStates} from './js/actor-states.js';
 
 
 window.Jstick = Jstick;
@@ -13,35 +13,51 @@ window.Jstick = Jstick;
 
 let myScene;
 let Actors;
-let myBackground
+let myBackground;
+let myfarBackground;
 let selectedActor;
+let mySceneLayer_Landscape 
+let mySceneLayer_Terrain   
+let mySceneLayer_Sprites   
 window.action = 'select';
 
 
 
 (async function(){
-    //Jstick.Viewport.hideDeviceCursor = true;
+    // Generate a new Scene, with three layers 
+    myScene = new Scene( 1087, 319);
+    mySceneLayer_Landscape = myScene.addLayer( 'landscape',  0 , 0.8);
+    mySceneLayer_Terrain   = myScene.addLayer( 'terrain',    1 );
+    mySceneLayer_Sprites   = myScene.addLayer( 'sprites',    2 );
+    
+    // assign the scene to the renderEngine as a source
+    Jstick.RenderEngine.output( '#container' );
+    Jstick.RenderEngine.input( myScene );
 
-    // Load the spritesheet
+    // Load the textures for the level backgrounds
+    myBackground       = await new Texture('./maps/map2.png');
+    myfarBackground    = await new Texture('./maps/back.jpg');
+
+    // Generate the mouse CURSOR sprites
     let spriteSheet    =  await new Texture( './spritesheet/lemmings.png' );
-
     let cursorSelected =  await new Sprite( spriteSheet,  133,  0, 14, 14 );
     let cursorRegular  =  await new Sprite( spriteSheet,  148,  0, 14, 14 );
 
-    myBackground    = await new Texture('./maps/map2.png');
-    let myfarBackground = await new Texture('./maps/back.jpg');
-    
-    myScene = new Scene( 1087, 319);
-    let mySceneLayer_Landscape = myScene.addLayer( 'landscape',  0 , 0.8);
-    let mySceneLayer_Terrain   = myScene.addLayer( 'terrain',    1 );
-    let mySceneLayer_Sprites   = myScene.addLayer( 'sprites',    2 );
-    
-    Jstick.RenderEngine.setScene( myScene );
+    // Enable control Interfaces and configure buttons
+    Jstick.Input.enableInterface('mouse');
+    Jstick.Input.enableInterface('keyboard');
+    configureInput();
 
+    // hide the native cursor
+    Jstick.Viewport.hideDeviceCursor = true;
+    Jstick.RenderEngine.fullscreen   = true;
+
+    // generate the game states (and its animations)
+    let myStates = await generateStates();
+
+    // set initial zoom, to fit the scene in the viewport
     myScene.Camera.zoomAnimation(Jstick.Viewport.height/myScene.height,400,150);
     
-   
-    let myStates = await generateStates();
 
     Actors = [];
     let interval = setInterval( ()=>{
@@ -59,18 +75,22 @@ window.action = 'select';
         if( Actors.length > 99 ) clearInterval( interval );
     }, 800);
 
+
     Jstick.Loop.draw = function(timestamp, input){
         document.getElementById('actorsCounts').innerHTML = Actors.length;
-
+        // clear all the Scene Layers
         mySceneLayer_Landscape.clear();
         mySceneLayer_Terrain.clear();
         mySceneLayer_Sprites.clear();
-        
+        // draw the background
         mySceneLayer_Landscape.drawTexture( myfarBackground, 0, 0 );
+        // draw the terrain
         mySceneLayer_Terrain.drawTexture( myBackground, 0, 0 );
-
+        // draw each character
         for(let i = 0; i < Actors.length; i++){
-            mySceneLayer_Sprites.drawSprite( Actors[i].getCurrentSprite(), Actors[i].x, Actors[i].y );
+            let flip = false;
+            if(Actors[i].attributes.direction === -1) flip = true;
+            mySceneLayer_Sprites.drawSprite( Actors[i].getCurrentSprite(), Actors[i].x, Actors[i].y , flip);
         }
 
 
@@ -80,17 +100,13 @@ window.action = 'select';
             let x =  box.x - Math.round( (cursorSelected.texture.width - box.width) / 2);
             let y =  box.y - Math.round( (cursorSelected.texture.height - box.height) / 2);
             
-            //console.log(cursorSelected,box, box.x, box.y, x, y)
             mySceneLayer_Sprites.drawSprite( cursorSelected , x, y  );
         }
 
-        let mouseAbsCoords = Jstick.Viewport.getAbsoluteCoordinates(input.MOUSEX, input.MOUSEY);
-        let coordActors    = actorsAtCoords( input.MOUSEX, input.MOUSEY );
+        let coordActors = actorsAtCoords( input.MOUSEX, input.MOUSEY );
 
-        if( coordActors.length ) mySceneLayer_Sprites.drawSprite( cursorSelected, (input.MOUSEX / Jstick.RenderEngine.activeScene.Camera.zoom )  -7 ,(input.MOUSEY / Jstick.RenderEngine.activeScene.Camera.zoom ) -7 ,'absolute'  );
-        else mySceneLayer_Sprites.drawSprite( cursorRegular, (input.MOUSEX / Jstick.RenderEngine.activeScene.Camera.zoom )-7 ,(input.MOUSEY / Jstick.RenderEngine.activeScene.Camera.zoom )-7 ,'absolute'  );
-
-
+        if( coordActors.length ) mySceneLayer_Sprites.drawSprite( cursorSelected, (input.MOUSEX / myScene.Camera.zoom ) +Jstick.RenderEngine.activeScene.Camera.x -7 ,(input.MOUSEY / myScene.Camera.zoom ) +Jstick.RenderEngine.activeScene.Camera.y -7  );
+        else mySceneLayer_Sprites.drawSprite( cursorRegular, (input.MOUSEX / myScene.Camera.zoom )-7 + Jstick.RenderEngine.activeScene.Camera.x,(input.MOUSEY / myScene.Camera.zoom ) +Jstick.RenderEngine.activeScene.Camera.y -7   );
 
     }
 

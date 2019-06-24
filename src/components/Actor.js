@@ -78,10 +78,6 @@ Actor.prototype.updateState = function(...args){
     return true;
 };
 
-Actor.prototype.draw = function(){
-    let sprite = this.getCurrentSprite();
-    Jstick.Sprite.draw( sprite , this.x, this.y,  this.flip.x, this.flip.y  );
-    return true;
-}
+
 
 export {Actor};

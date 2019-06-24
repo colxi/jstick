@@ -29,18 +29,22 @@ const Sprite = /* async */ function( image = '', x=0, y=0, w, h ){
         w = w || image.width;
         h = h || image.height;
         // crop the image
-        let spriteImage = await image.cloneFromArea ( x, y, w, h );
-        
-        // cache the resultimg image (cache will cache the flipped versions too)
-        // await Jstick.Cache.sprite( spriteImage ); 
+        let spriteImage = await image.cloneFromArea( x, y, w, h );
 
         // build the Sprite object
         this.__type__ = 'Sprite';
         this.texture = spriteImage;
-        this.flip = {
-            x : false,
-            y : false
-        };
+
+        this.cache   = {
+            flipX  : await spriteImage.clone(),
+            flipY  : await spriteImage.clone(),
+            flipXY : await spriteImage.clone()
+        }
+        this.cache.flipX.flip(true, false);
+        this.cache.flipY.flip(false, true);
+        this.cache.flipXY.flip(true, true);
+
+      
         /*
         // TODO !!! ¿ Sprite padding : add blank space?
         this.padding = {

@@ -24,11 +24,11 @@ const Scene = function( width, height ){
             zoomFactor : zoomFactor,
             index   : index,
             name    : layerName,
-            drawTexture : (texture,x,y,position='relative')=>{
-                Jstick.RenderEngine.draw( texture, x, y, layerName, position );
+            drawTexture : (texture,x,y)=>{
+                Jstick.RenderEngine.draw( texture, x, y, layerName );
             },
-            drawSprite : (sprite,x,y,position='relative')=>{
-                Jstick.RenderEngine.draw( sprite, x, y, layerName, position );
+            drawSprite : (sprite,x, y, flipX=false, flipY=false)=>{
+                Jstick.RenderEngine.draw( sprite, x, y, layerName, flipX, flipY );
             },
             clear : ()=>{
                 Jstick.RenderEngine.clear( layerName );

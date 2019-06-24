@@ -18,9 +18,9 @@ Jstick.Viewport = {
     /* SIZES AND APPEARENCE PROPERTIES
     /*
     /*********************************************************************/
-    width     : document.getElementById('container').offsetWidth << 0,
-    height    : document.getElementById('container').offsetHeight << 0,
-    container :  document.getElementById('container'),
+    width     : null,
+    height    : null,
+    container : null,
 
 
     // Show/hide native device cursor (applies : CSS cursor:none)
@@ -35,6 +35,8 @@ Jstick.Viewport = {
         HIDE_DEVICE_CURSOR = value;
         return true;
     },
+
+    
 
   
 
