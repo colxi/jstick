@@ -1,7 +1,6 @@
-import {Texture}  from '../../src/components/Texture.js';
-import {Animation} from '../../src/components/Animation.js';
-import {State}     from '../../src/components/State.js';
-import {Sprite}    from '../../src/components/Sprite.js';
+import { Sprite, Animation, Texture, State}  from '../../src/jstick.js';
+
+
 
 
 function checkGroundCollision( sprite ){

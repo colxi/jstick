@@ -14,7 +14,7 @@ import {Texture}  from './Texture.js';
 const Sprite = /* async */ function( image = '', x=0, y=0, w, h ){
     // handle requests performed without using the keyword 'new'
     // otherwhise the Constructor will fail for the lack of own context (this)
-    if( !this ) return new Sprite(image, x, y, w, h);
+    if( !new.target ) return new Sprite( ...arguments );
     
     return new Promise( async resolve =>{
         // input validation

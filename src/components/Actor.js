@@ -6,7 +6,7 @@ let ACTOR_ID = 0;
 const Actor =  function( config  ){
     // handle requests performed without using the keyword 'new'
     // otherwhise the Constructor will fail for the lack of own context (this)
-    if( !this ) return new Actor( name );
+    if( !new.target ) return new Actor( ...arguments );
 
     this.__id__                    = ACTOR_ID++;
     this.__stateTick__             = 0;
