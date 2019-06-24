@@ -1,0 +1,19 @@
+{
+  "name": "jstick",
+  "version": "1.0.0",
+  "description": "2D Sprite based game engine for javascript",
+  "main": "/src/jstick.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/colxi/jstick.git"
+  },
+  "author": "colxi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/colxi/jstick/issues"
+  },
+  "homepage": "https://github.com/colxi/jstick#readme"
+}
