@@ -77,7 +77,7 @@ window.action = 'select';
 
 
     Jstick.Loop.draw = function(timestamp, input){
-        document.getElementById('actorsCounts').innerHTML = Actors.length;
+        
         // clear all the Scene Layers
         mySceneLayer_Landscape.clear();
         mySceneLayer_Terrain.clear();
@@ -111,6 +111,11 @@ window.action = 'select';
     }
 
     Jstick.Loop.update = function( deltaTime , input ){
+        document.getElementById('actorsCounts').innerHTML = Actors.length;
+        document.getElementById('FPS').innerHTML = Jstick.Loop.fps;
+        document.getElementById("scaleInfo").innerHTML = Jstick.RenderEngine.activeScene.Camera.zoom.toFixed(2);
+        document.getElementById("scrollInfo").innerHTML = ( Jstick.RenderEngine.activeScene.Camera.x << 0 ) +' | '+ ( Jstick.RenderEngine.activeScene.Camera.y << 0 );
+
         document.getElementById('inputMouseCoords').innerHTML = input['MOUSEX'] + '-' + input['MOUSEY'];
         document.getElementById('inputMouseLeft').innerHTML = input['mouse-left'];
         document.getElementById('inputMouseRight').innerHTML = input['mouse-right'];

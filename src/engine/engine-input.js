@@ -109,7 +109,6 @@ Jstick.Input = {
      *                     module and initializes it.
      */
     async importInterface( iface ){
-        Jstick.log('Jstick.Input.importInterface() : Importing interface : ', iface);
         if( typeof iface !== 'string' || !iface.trim().length ) throw new Error('Interface identifier must be a valid string');
         //if interface has already been imported, return
         if( !Jstick.Input.interfaceExist( iface ) ){
@@ -129,7 +128,6 @@ Jstick.Input = {
      * 
      */
     enableInterface( iface ){
-        Jstick.log('Jstick.Input.enableInterface() : Enabling interface : ', iface);
         if( typeof iface !== 'string' || !iface.trim().length ) throw new Error('Interface identifier must be a valid string');
         // block if interface does not exist
         if( !Jstick.Input.interfaceExist( iface ) ) throw new Error('Unknown interface provided : ' + iface);
@@ -158,7 +156,6 @@ Jstick.Input = {
      *                      the interface signals.
      */
     disableInterface( iface ){
-        Jstick.log('Jstick.Input.disableInterface() : Disabling interface : ', iface);
         if( typeof iface !== 'string' || !iface.trim().length ) throw new Error('Interface identifier must be a valid string');
 
         // block if interface does not exist
@@ -243,7 +240,6 @@ Jstick.Input = {
      * registerButton() : Registers a virtual button with a unique id
      */
     registerButton( vButton ){
-        Jstick.log('Jstick.Input.registerButton() : Registering Game Button : ', vButton);
         if( typeof vButton !== 'string' || !vButton.trim().length ) throw new Error('Button identifier must be a valid string');
         // if button is already registered return false
         if( VIRTUAL_BUTTONS_STATE.hasOwnProperty( vButton ) ) return false;
@@ -258,7 +254,6 @@ Jstick.Input = {
      *                      activate it
      */
     setButtonMapping( interfaceSignal, vButton ){
-        Jstick.log('Jstick.Input.setButtonMapping() : Mapping "'+interfaceSignal+'" to game button "'+vButton+'"');
         // error if requested game button does not exist
         if( !VIRTUAL_BUTTONS_STATE.hasOwnProperty( vButton ) ){ 
             throw new Error('Button "'+vButton+'" has not been registered');

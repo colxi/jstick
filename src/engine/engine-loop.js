@@ -38,7 +38,6 @@ Jstick.Loop = {
         let input = Jstick.Input.getStatus();
         Jstick.Loop.update( timestamp, input );
         Jstick.Loop.draw( timestamp, input );
-        if( Jstick.showInfo ) Jstick.updateInfo();
         // reset some possible events like mousewheel
         Jstick.Input.__update__();
     },
