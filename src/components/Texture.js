@@ -112,7 +112,13 @@ const Texture = /* async */ function( filepath = '' ){
             if (typeof horizontal !== "boolean" || typeof vertical !== "boolean" ){
                 throw new Error('Only boolean values are accepted')
             }
-            // apply flip transform
+            // get sprite data and clean canvas
+            let original  = IMAGE_CANVAS.canvas.transferToImageBitmap();
+            // transferToImageBitmap cleans the canvas automatically... 
+            // manual clean not neceswsary
+            // IMAGE_CANVAS.clearRect(0, 0, Jstick.Viewport.width, Jstick.Viewport.height);
+            
+            // apply transform
             IMAGE_CANVAS.setTransform(
                 (horizontal ? -1 : 1), 0,       // set the direction of x axis
                 0, (vertical ? -1 : 1),         // set the direction of y axis
@@ -120,8 +126,9 @@ const Texture = /* async */ function( filepath = '' ){
                 (vertical ? HEIGHT : 0)         // set the y origin
             );
             // redraw image (flip will be applied)
-            IMAGE_CANVAS.drawImage( IMAGE_CANVAS.canvas ,0, 0 );
-            IMAGE_CANVAS.resetTransform(); // polyfill : IMAGE_CANVAS.setTransform(1, 0, 0, 1, 0, 0);
+            IMAGE_CANVAS.drawImage( original ,0, 0 );
+            // reset transform
+            IMAGE_CANVAS.setTransform(1, 0, 0, 1, 0, 0); 
             // update IMAGEDATA object 
             IMAGE_DATA = IMAGE_CANVAS.getImageData(0, 0, WIDTH , HEIGHT );
             this.apply();

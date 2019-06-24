@@ -35,12 +35,11 @@
             }
 
             #container{
+                width: 400px;
+                height: 300px;
+                display: block;
+                margin: auto;
                 position: relative;
-                width: 100%;
-                height: 100%;
-                place-self: center;
-                top: 0px;
-                bottom: 0px;
             }
             .button{
                 background: grey;
@@ -101,11 +100,6 @@
             <div class="button action" onclick="window.action='mine'">MINE</div>
 
         </div>
-        <div id="container">
-            <canvas id="map" width="1087" height="319" ></canvas>
-            <canvas id="sprites" width="1087" height="319" ></canvas>
-        </div>
-        
-        <img id="img" style="display:none" src="">
+        <div id="container"></div>
     </body>
 </html>
