@@ -4,13 +4,27 @@ import {setupInterface as setupInterface_Keyboard} from './input-interfaces/keyb
 
 let Input = function( _instance_ ){
     
-    // TODO : move the private methods to a new module like 'engine-input-state.js'
-    //        to keep them out of the public API
+    /**
+     * __interfaceSignal__() : Internal method to recieve signals from the interface modules
+     *                         and change the input state
+     */
+    function __interfaceSignal__( interfaceSignal, value, attributeFlag=false ){
+        // if is an attribute , set the value
+        if(attributeFlag) VIRTUAL_BUTTONS_STATE[ interfaceSignal ] = value;
+        // if is not an attribute, assign the value only if the signal is mapped
+        // to a virtual button
+        else{
+            let virtualButtonId = INTERFACES_BUTTONS_MAPPINGS[ interfaceSignal ];
+            if( typeof virtualButtonId === 'undefined' ) return false;
+            VIRTUAL_BUTTONS_STATE[ virtualButtonId ] = value;
+        }
+        return true;
+    };
 
     // Container for loaded/imported interfaces
     let INTERFACES = {
-        'mouse'    : setupInterface_Mouse( _instance_ ),
-        'keyboard' : setupInterface_Keyboard( _instance_ )
+        'mouse'    : setupInterface_Mouse( _instance_.Viewport.container, __interfaceSignal__,  _instance_ ),
+        'keyboard' : setupInterface_Keyboard( _instance_.Viewport.container, __interfaceSignal__,  _instance_ )
     };
 
     // List of enabled interfaces
@@ -37,23 +51,6 @@ let Input = function( _instance_ ){
 
     return {
     /**
-     * __interfaceSignal__() : Internal method to recieve signals from the interface modules
-     *                         and change the input state
-     */
-    __interfaceSignal__( interfaceSignal, value, attributeFlag=false ){
-        // if is an attribute , set the value
-        if(attributeFlag) VIRTUAL_BUTTONS_STATE[ interfaceSignal ] = value;
-        // if is not an attribute, assign the value only if the signal is mapped
-        // to a virtual button
-        else{
-            let virtualButtonId = INTERFACES_BUTTONS_MAPPINGS[ interfaceSignal ];
-            if( typeof virtualButtonId === 'undefined' ) return false;
-            VIRTUAL_BUTTONS_STATE[ virtualButtonId ] = value;
-        }
-        return true;
-    },
-
-    /**
      * __registerInterfaceAttribute__() : Registers a new interface attribute in the
      *                                    Input state object
      */
@@ -71,20 +68,11 @@ let Input = function( _instance_ ){
         return true;
     },
 
-     /**
-     * __setButtonState__() : Internal method to allow virtual buttons states to be changed 
-     *                        programatically
-     */
-    __setButtonState__( vButton, value){
-        if( !VIRTUAL_BUTTONS_STATE.hasOwnProperty( vButton ) ) return false;
-        VIRTUAL_BUTTONS_STATE[ vButton ] = value;
-        return true;
-    },
-
     /**
      * __update__() : Internal method called by the game loop. Will call each active interface  
      *                .update() method in order to perform internal tasks in each loop cycle
      */
+    // TODO : This functions subscribes to Scheduler.afterTick()
     __update__(){
         VIRTUAL_BUTTONS_OLD_STATE = {...VIRTUAL_BUTTONS_STATE};
 

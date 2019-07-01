@@ -21,6 +21,8 @@ window.action = 'select';
 (async function(){
     window.game = game = new Jstick('#container');
 
+    console.log(game);
+
     // Generate a new Scene, with three layers 
     game.Scene.width  = 1087;
     game.Scene.height = 319;
@@ -51,7 +53,6 @@ window.action = 'select';
     game.Viewport.fullscreen       = true;
     
 
-    console.log(game);
 
     // generate the game states (and its animations)
     let myStates = await generateStates();
@@ -68,7 +69,7 @@ window.action = 'select';
                 state  : 'walk',
                 x      : 470,
                 y      : 102,
-                attributes : {
+                data : {
                     direction : 1
                 }
             }) 
@@ -90,7 +91,7 @@ window.action = 'select';
         // draw each character
         for(let i = 0; i < Actors.length; i++){
             let flip = false;
-            if(Actors[i].attributes.direction === -1) flip = true;
+            if(Actors[i].data.direction === -1) flip = true;
             sceneLayer_Sprites.drawSprite( Actors[i].getCurrentSprite(), Actors[i].x, Actors[i].y , flip);
         }
 
@@ -112,6 +113,8 @@ window.action = 'select';
     }
 
     game.Loop.update = function( deltaTime , input ){
+        //console.log(input);
+        //return;
         document.getElementById('actorsCounts').innerHTML = Actors.length;
         document.getElementById('FPS').innerHTML = game.Renderer.fps;
         document.getElementById("scaleInfo").innerHTML = game.Camera.zoom.toFixed(2);

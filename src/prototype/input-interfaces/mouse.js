@@ -1,36 +1,44 @@
+// Viewport , __registerInterfaceAttribute__, __unregisterInterfaceAttribute__,  sendSignal , 
 
-let setupInterface = function( _instance_ ){
+
+let setupInterface = function( Viewport, sendSignal, _instance_ ){
     return {
         name    : 'mouse',
         signals : [ 'MOUSECLICK' , 'MOUSELEFT', 'MOUSERIGHT', 'MOUSEWHEELUP', 'MOUSEWHEELDOWN' ],
+        // todo: interface controller modifies tthis object, and in each tick, its contents 
+        // are made accessible to the user 
+        properties : {
+            MOUSEX : 0,
+            MOUSEY : 0 
+        },
         enable(){
-            _instance_.Viewport.container.addEventListener ( 'click', mouseClick, false);
-            _instance_.Viewport.container.addEventListener ( 'mousedown', mouseDown, false);
-            _instance_.Viewport.container.addEventListener ( 'mouseup', mouseUp, false );
-            _instance_.Viewport.container.addEventListener ( 'mousewheel', mouseWheel, false );
-            _instance_.Viewport.container.addEventListener ( 'mousemove', mouseMove, false );
-            _instance_.Viewport.container.addEventListener ( 'contextmenu', contextMenu, false );
+            Viewport.addEventListener ( 'click', mouseClick, false);
+            Viewport.addEventListener ( 'mousedown', mouseDown, false);
+            Viewport.addEventListener ( 'mouseup', mouseUp, false );
+            Viewport.addEventListener ( 'mousewheel', mouseWheel, false );
+            Viewport.addEventListener ( 'mousemove', mouseMove, false );
+            Viewport.addEventListener ( 'contextmenu', contextMenu, false );
 
             _instance_.Input.__registerInterfaceAttribute__( 'MOUSEX' , 0);
             _instance_.Input.__registerInterfaceAttribute__( 'MOUSEY' , 0);
             return true;
         },
         disable(){
-            _instance_.Viewport.container.removeEventListener ( 'click', mouseClick ,false);
-            _instance_.Viewport.container.removeEventListener ( 'mousedown', mouseDown ,false);
-            _instance_.Viewport.container.removeEventListener ( 'mouseup', mouseUp ,false);
-            _instance_.Viewport.container.removeEventListener ( 'mousewheel', mouseWheel ,false);
-            _instance_.Viewport.container.removeEventListener ( 'mousemove', mouseMove, false );
-            _instance_.Viewport.container.removeEventListener ( 'contextmenu', contextMenu ,false);
+            Viewport.removeEventListener ( 'click', mouseClick ,false);
+            Viewport.removeEventListener ( 'mousedown', mouseDown ,false);
+            Viewport.removeEventListener ( 'mouseup', mouseUp ,false);
+            Viewport.removeEventListener ( 'mousewheel', mouseWheel ,false);
+            Viewport.removeEventListener ( 'mousemove', mouseMove, false );
+            Viewport.removeEventListener ( 'contextmenu', contextMenu ,false);
 
-            _instance_.Input.__unregisterInterfaceAttribute__( 'MOUSEX' , 0);
-            _instance_.Input.__unregisterInterfaceAttribute__( 'MOUSEY' , 0);
+            _instance_.Input.__unregisterInterfaceAttribute__( 'MOUSEX' );
+            _instance_.Input.__unregisterInterfaceAttribute__( 'MOUSEY' );
             return true;
         },
         update(){
-            _instance_.Input.__interfaceSignal__( 'MOUSECLICK' , false );
-            _instance_.Input.__interfaceSignal__( 'MOUSEWHEELUP' , false );
-            _instance_.Input.__interfaceSignal__( 'MOUSEWHEELDOWN' , false );
+            sendSignal( 'MOUSECLICK' , false );
+            sendSignal( 'MOUSEWHEELUP' , false );
+            sendSignal( 'MOUSEWHEELDOWN' , false );
         },
     };
 
@@ -38,35 +46,35 @@ let setupInterface = function( _instance_ ){
     function mouseMove(e){
         let x = e.layerX;
         let y = e.layerY;
-        _instance_.Input.__interfaceSignal__( 'MOUSEX' , x , true ); 
-        _instance_.Input.__interfaceSignal__( 'MOUSEY' , y , true ); 
+        sendSignal( 'MOUSEX' , x , true ); 
+        sendSignal( 'MOUSEY' , y , true ); 
     };
 
 
     function mouseClick(e){
         e.preventDefault();
-        _instance_.Input.__interfaceSignal__( 'MOUSECLICK' , true ); 
+        sendSignal( 'MOUSECLICK' , true ); 
     }
 
     function mouseDown(e){
         e.preventDefault();
         let button = e.button;
-        if(button === 0) _instance_.Input.__interfaceSignal__( 'MOUSELEFT' , true ); 
-        else if(button === 2)  _instance_.Input.__interfaceSignal__( 'MOUSERIGHT' , true );  
+        if(button === 0) sendSignal( 'MOUSELEFT' , true ); 
+        else if(button === 2)  sendSignal( 'MOUSERIGHT' , true );  
     }
 
     function mouseUp(e){
         e.preventDefault();
         let button  = e.button;
-        if(button === 0) _instance_.Input.__interfaceSignal__( 'MOUSELEFT' , false ); 
-        else if(button === 2)  _instance_.Input.__interfaceSignal__( 'MOUSERIGHT' , false );  
+        if(button === 0) sendSignal( 'MOUSELEFT' , false ); 
+        else if(button === 2)  sendSignal( 'MOUSERIGHT' , false );  
     }
 
     function mouseWheel(e){
         e.preventDefault();
         let direction = e.deltaY > 0 ? 1 : -1;
-        if( direction === 1) _instance_.Input.__interfaceSignal__( 'MOUSEWHEELUP' , true );
-        else _instance_.Input.__interfaceSignal__( 'MOUSEWHEELDOWN' , true ); 
+        if( direction === 1) sendSignal( 'MOUSEWHEELUP' , true );
+        else sendSignal( 'MOUSEWHEELDOWN' , true ); 
     };
 
     function contextMenu(e){

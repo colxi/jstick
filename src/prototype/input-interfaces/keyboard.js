@@ -1,5 +1,5 @@
 
-let setupInterface = function( _instance_ ){
+let setupInterface = function( Viewport,  sendSignal , _instance_ ){
     return {
         name    : 'keyboard',
         signals : [
@@ -13,6 +13,9 @@ let setupInterface = function( _instance_ ){
             //'ª', '!', '"', '·', '$', '%', '&', '/', '(', ')', '=', '?', '¿', '¡', '\'', '\\',
             //'|', '@', '#', '~', '€', '¬'
         ],
+        properties : {
+            /* NONE  */
+        },
         enable(){
             window.addEventListener( 'keyup', keyUp, false);
             window.addEventListener( 'keydown', keyDown, false );
@@ -28,14 +31,14 @@ let setupInterface = function( _instance_ ){
     function keyDown(e){
         e.preventDefault();
         let key = e.key.toUpperCase();
-        _instance_.Input.__interfaceSignal__( key , true ); 
+        sendSignal( key , true ); 
         return;
     }
     
     function keyUp(e){
         e.preventDefault();
         let key = e.key.toUpperCase();
-        _instance_.Input.__interfaceSignal__( key , false ); 
+        sendSignal( key , false ); 
         return;
     }
     

@@ -18,8 +18,8 @@ function canGoDown( actor ){
     let bottomY = Math.floor( sprite.y + 5-1 );
 
     if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)+1) &&
-        pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.attributes.direction), groundY(lem)+1) &&
-        pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.attributes.direction), groundY(lem)+1) ){
+        pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.data.direction), groundY(lem)+1) &&
+        pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.data.direction), groundY(lem)+1) ){
         return true;
     }
     */
@@ -82,8 +82,8 @@ async function generateStates(){
             (lem, pixelMap)=>{
                 // block if empty under the lemming
                 if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)+1) &&
-                pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.attributes.direction), groundY(lem)+1) &&
-                pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.attributes.direction), groundY(lem)+1) ){
+                pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.data.direction), groundY(lem)+1) &&
+                pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.data.direction), groundY(lem)+1) ){
                     lem.setState('fall');
                     return;
                 }
@@ -110,8 +110,8 @@ async function generateStates(){
             (lem, pixelMap)=>{
                 // block if empty under the lemming
                 if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)+1) &&
-                pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.attributes.direction), groundY(lem)+1) &&
-                pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.attributes.direction), groundY(lem)+1) ){
+                pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.data.direction), groundY(lem)+1) &&
+                pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.data.direction), groundY(lem)+1) ){
                     lem.setState('fall');
                     return;
                 }
@@ -135,12 +135,12 @@ async function generateStates(){
             walkAnimation,
             (lem, pixelMap)=>{
                 if(lem.actionTick % 3) return;
-                lem.x  = lem.x + ( .5 * lem.attributes.direction );
+                lem.x  = lem.x + ( .5 * lem.data.direction );
                 
                 // if should fall... adjust y coordinate
                 if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)+1) &&
-                    pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.attributes.direction), groundY(lem)+1) &&
-                    pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.attributes.direction), groundY(lem)+1) ){ 
+                    pixelMap.isPixelTransparent(groundX(lem) + (1 *lem.data.direction), groundY(lem)+1) &&
+                    pixelMap.isPixelTransparent(groundX(lem) + (2 *lem.data.direction), groundY(lem)+1) ){ 
                     lem.y++;
                     // if the fall is bigger than 3 pixels, set falling action
                     if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)+1) && 
@@ -156,17 +156,17 @@ async function generateStates(){
                     else if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)-1) ) lem.y -= 1;
                     else if( pixelMap.isPixelTransparent(groundX(lem), groundY(lem)-2) ) lem.y -= 2;
                     else{
-                        lem.attributes.direction *= -1;
+                        lem.data.direction *= -1;
                         lem.flip.x = !lem.flip.x;
-                        lem.x  = lem.x + ( 1 * lem.attributes.direction );
+                        lem.x  = lem.x + ( 1 * lem.data.direction );
                     } 
 
                     if( !pixelMap.isPixelTransparent(groundX(lem), groundY(lem)-3) ||
                         !pixelMap.isPixelTransparent(groundX(lem), groundY(lem)-4) 
                     ){ 
-                        lem.attributes.direction *= -1;
+                        lem.data.direction *= -1;
                         lem.flip.x = !lem.flip.x;
-                        lem.x  = lem.x + ( 1 * lem.attributes.direction );
+                        lem.x  = lem.x + ( 1 * lem.data.direction );
                     }
                 }
             }
