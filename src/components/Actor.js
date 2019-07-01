@@ -6,7 +6,7 @@ let ACTOR_ID = 0;
 const Actor =  function( config  ){
     // handle requests performed without using the keyword 'new'
     // otherwhise the Constructor will fail for the lack of own context (this)
-    if( !this ) return new Actor( name );
+    if( !new.target ) return new Actor( ...arguments );
 
     this.__id__                    = ACTOR_ID++;
     this.__stateTick__             = 0;
@@ -20,8 +20,8 @@ const Actor =  function( config  ){
         x : false,
         y : false
     }
-    this.attributes     = config.attributes || {}; // eg: vulnerable, block, ...
-    this.attributes.__parent__ = this;
+    this.data     = config.data || {}; // eg: vulnerable, block, ...
+    this.data.__parent__ = this;
     for(let i=0; i<config.states.length; i++){
         let stateName = config.states[i].name;
         this.__states__[stateName] = config.states[i];

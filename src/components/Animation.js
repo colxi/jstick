@@ -1,4 +1,3 @@
-import {Jstick} from '../jstick.js';
 
 /**
  * 
@@ -30,7 +29,8 @@ import {Jstick} from '../jstick.js';
 const Animation = function( keyframes , length , loop){
     // handle requests performed without using the keyword 'new'
     // otherwhise the Constructor will fail for the lack of own context (this)
-    if( !this ) return new Animation( keyframes , length , loop );
+    if( !new.target ) return new Animation( ...arguments );
+
     
     if(typeof keyframes !== 'object') throw new Error('Argument 1 must be an object containing keyframes');
     

@@ -1,4 +1,3 @@
-import {Jstick} from '../jstick.js';
 
 
 /**
@@ -9,7 +8,7 @@ import {Jstick} from '../jstick.js';
 const State = function( name, animation, controller ){
     // handle requests performed without using the keyword 'new'
     // otherwhise the Constructor will fail for the lack of own context (this)
-    if( !this ) return new State( name, animation, controller );
+    if( !new.target ) return new State( ...arguments );
 
     // validate the name
     if( typeof name !== 'string' || !name.trim().length ) throw new Error('First argument ("name") must be a non empty string');

@@ -1,35 +1,34 @@
-import {Jstick} from '../../src/jstick.js';
 
-function configureInput(){
-    Jstick.Input.enableInterface('mouse');
-    Jstick.Input.enableInterface('keyboard');
+function configureInput( game ){
+    game.Input.enableInterface('mouse');
+    game.Input.enableInterface('keyboard');
 
     // register virtual game buttons
-    Jstick.Input.registerButton( 'draw-but' );
-    Jstick.Input.registerButton( 'erase-but' );
-    Jstick.Input.registerButton( 'arrow-up' );
-    Jstick.Input.registerButton( 'arrow-down' );
-    Jstick.Input.registerButton( 'arrow-left' );
-    Jstick.Input.registerButton( 'arrow-right' );
-    Jstick.Input.registerButton( 'mouse-left' );
-    Jstick.Input.registerButton( 'mouse-right' );
-    Jstick.Input.registerButton( 'mouse-click' );
-    Jstick.Input.registerButton( 'mouse-wheel-up' );
-    Jstick.Input.registerButton( 'mouse-wheel-down' );
+    game.Input.registerButton( 'draw-but' );
+    game.Input.registerButton( 'erase-but' );
+    game.Input.registerButton( 'arrow-up' );
+    game.Input.registerButton( 'arrow-down' );
+    game.Input.registerButton( 'arrow-left' );
+    game.Input.registerButton( 'arrow-right' );
+    game.Input.registerButton( 'mouse-left' );
+    game.Input.registerButton( 'mouse-right' );
+    game.Input.registerButton( 'mouse-click' );
+    game.Input.registerButton( 'mouse-wheel-up' );
+    game.Input.registerButton( 'mouse-wheel-down' );
 
     // map the mouse actions to game  virtual buttons
-    Jstick.Input.setButtonMapping( 'MOUSECLICK'     , 'mouse-click' );
-    Jstick.Input.setButtonMapping( 'MOUSELEFT'      , 'mouse-left' );
-    Jstick.Input.setButtonMapping( 'MOUSERIGHT'     , 'mouse-right' );
-    Jstick.Input.setButtonMapping( 'MOUSEWHEELUP'   , 'mouse-wheel-up' );
-    Jstick.Input.setButtonMapping( 'MOUSEWHEELDOWN' , 'mouse-wheel-down' );
+    game.Input.setButtonMapping( 'MOUSECLICK'     , 'mouse-click' );
+    game.Input.setButtonMapping( 'MOUSELEFT'      , 'mouse-left' );
+    game.Input.setButtonMapping( 'MOUSERIGHT'     , 'mouse-right' );
+    game.Input.setButtonMapping( 'MOUSEWHEELUP'   , 'mouse-wheel-up' );
+    game.Input.setButtonMapping( 'MOUSEWHEELDOWN' , 'mouse-wheel-down' );
         // map the keyboard buttons to game  virtual buttons
-    Jstick.Input.setButtonMapping( 'D'              , 'draw-but' );
-    Jstick.Input.setButtonMapping( 'E'              , 'erase-but' );
-    Jstick.Input.setButtonMapping( 'ARROWUP'        , 'arrow-up' );
-    Jstick.Input.setButtonMapping( 'ARROWDOWN'      , 'arrow-down' );
-    Jstick.Input.setButtonMapping( 'ARROWLEFT'      , 'arrow-left' );
-    Jstick.Input.setButtonMapping( 'ARROWRIGHT'     , 'arrow-right' );
+    game.Input.setButtonMapping( 'D'              , 'draw-but' );
+    game.Input.setButtonMapping( 'E'              , 'erase-but' );
+    game.Input.setButtonMapping( 'ARROWUP'        , 'arrow-up' );
+    game.Input.setButtonMapping( 'ARROWDOWN'      , 'arrow-down' );
+    game.Input.setButtonMapping( 'ARROWLEFT'      , 'arrow-left' );
+    game.Input.setButtonMapping( 'ARROWRIGHT'     , 'arrow-right' );
 
 }
 

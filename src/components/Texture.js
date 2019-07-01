@@ -23,7 +23,7 @@ async function _loadImage_(src){
 const Texture = /* async */ function( filepath = '' ){
     // handle requests performed without using the keyword 'new'
     // otherwhise the Constructor will fail for the lack of own context (this)
-    if( !this ) return new Texture( filepath );
+    if( !new.target ) return new Texture( ...arguments );
 
     return new Promise( async resolve =>{
         let tmp_image;
@@ -112,12 +112,9 @@ const Texture = /* async */ function( filepath = '' ){
             if (typeof horizontal !== "boolean" || typeof vertical !== "boolean" ){
                 throw new Error('Only boolean values are accepted')
             }
-            // get sprite data and clean canvas
+            // get sprite data and clean canvas ( transferToImageBitmap performs the clean automatically ) 
             let original  = IMAGE_CANVAS.canvas.transferToImageBitmap();
-            // transferToImageBitmap cleans the canvas automatically... 
-            // manual clean not neceswsary
-            // IMAGE_CANVAS.clearRect(0, 0, Jstick.Viewport.width, Jstick.Viewport.height);
-            
+
             // apply transform
             IMAGE_CANVAS.setTransform(
                 (horizontal ? -1 : 1), 0,       // set the direction of x axis
